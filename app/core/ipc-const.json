@@ -1,0 +1,5 @@
+{
+    "RPCAM_SERRVER_ID": "rpcam",
+    "RPCAM_SERRVER_RETRY": 1500,
+    "RP_CAM_CAPTURE_SOCKET": "/tmp/capture"
+}

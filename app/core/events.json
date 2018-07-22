@@ -1,0 +1,9 @@
+{
+    "CONNECT": "connect",
+    "DISCONNECT": "disconnect",
+    "RPCAM_CAPTURE": "rp-cam.capture",
+    "RPCAM_CAPTURE_READY": "rp-cam.capture-ready",
+    "RPCAM_VIDEO_RECORD": "rp-cam.record",
+    "RPCAM_VIDEO_RECORD_READY": "rp-cam.record-ready",
+    "RPCAM_MOTION_DETECTED": "rp-cam.motion-detected"
+}
