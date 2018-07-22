@@ -8,4 +8,5 @@ if __name__ == '__main__':
     ipcConst = fs_util.get_ipc_const()
     events = fs_util.get_ipc_events()
     camIpc = IpcCamera(ipcConst['RP_CAM_CAPTURE_SOCKET'], events)
+    fs_util.create_dirs()
     camIpc.start_co()
