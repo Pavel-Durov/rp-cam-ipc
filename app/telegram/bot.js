@@ -3,7 +3,6 @@ const commands = require('./commands');
 const logger = require('../core/logger');
 const LOG_TAG = 'TELEGRAM_BOT';
 
-const SUBSCRIBERS = [];
 
 const STR = {
     SUB_SUCCESS: 'Thanks for subscribing👍',
@@ -14,6 +13,7 @@ const STR = {
 }
 
 const bot = {
+    SUBSCRIBERS: [],
     ipc: {},
     api: {},
     takeImage: num => bot.ips.capture(num),
@@ -23,18 +23,18 @@ const bot = {
     },
     subscribe: id => {
         let msg = STR.SUB_SUCCESS;
-        if (SUBSCRIBERS.indexOf(id) > -1) {
+        if (bot.SUBSCRIBERS.indexOf(id) > -1) {
             msg = STR.SUB_FAIL_EXIST;
         } else {
-            SUBSCRIBERS.push(id);
+            bot.SUBSCRIBERS.push(id);
         }
         bot.sendMessage(msg);
     },
     unsubscribe: id => {
-        const index = SUBSCRIBERS.indexOf(id);
+        const index = bot.SUBSCRIBERS.indexOf(id);
         if (index != -1) {
             bot.sendMessage(STR.UNSUB_SUCCESS);
-            SUBSCRIBERS.pop(index);
+            bot.SUBSCRIBERS.pop(index);
         }
     },
     sendImage: imgPaths => {
@@ -46,7 +46,7 @@ const bot = {
         bot.notifySubscribers(id => bot.api.sendVideo({ chat_id: id, caption: caption, video: path }));
     },
     notifySubscribers: func => {
-        SUBSCRIBERS.forEach(id => {
+        bot.SUBSCRIBERS.forEach(id => {
             func(id)
                 .then(data => logger.error(LOG_TAG, data))
                 .catch(err => logger.error(LOG_TAG, err))
