@@ -9,9 +9,10 @@ ipc.config.id = 'telegram_bot';
 ipc.config.retry = 1000;
 
 ipc.connectTo(ipcConst.RPCAM_SERRVER_ID, ipcConst.RP_CAM_CAPTURE_SOCKET, () => {
+    const server = ipc.of[ipcConst.RPCAM_SERRVER_ID];
     const botIpcBridge = {
         emit: (cmd, payload) => {
-            ipc.of.rpcam.emit(cmd, {
+            server.emit(cmd, {
                 id: ipc.config.id,
                 payload: payload
             });
@@ -24,23 +25,23 @@ ipc.connectTo(ipcConst.RPCAM_SERRVER_ID, ipcConst.RP_CAM_CAPTURE_SOCKET, () => {
         }
     };
 
-    ipc.of.rpcam.on(ipcEvents.CONNECT, () => {
+    server.on(ipcEvents.CONNECT, () => {
         telegram_bot.start(botIpcBridge)
             .then(tbot => logger.info(LOG_TAG, 'telegram_bot STARTED'))
             .catch(err => logger.error(LOG_TAG, err));
     });
 
-    ipc.of.rpcam.on(ipcEvents.RPCAM_CAPTURE_READY, data => {
+    server.on(ipcEvents.RPCAM_CAPTURE_READY, data => {
         logger.info(LOG_TAG, ipcEvents.RPCAM_CAPTURE_READY, data)
         telegram_bot.sendImage(data.payload);
     });
 
-    ipc.of.rpcam.on(ipcEvents.RPCAM_VIDEO_RECORD_READY, data => {
+    server.on(ipcEvents.RPCAM_VIDEO_RECORD_READY, data => {
         logger.info(LOG_TAG, ipcEvents.RPCAM_VIDEO_RECORD_READY, data)
         telegram_bot.sendVideo(data.payload);
     });
 
-    ipc.of.rpcam.on(ipcEvents.DISCONNECT, () => {
+    server.on(ipcEvents.DISCONNECT, () => {
         ipc.log('disconnected from world');
     });
 
