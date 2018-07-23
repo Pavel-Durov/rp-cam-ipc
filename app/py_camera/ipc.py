@@ -4,6 +4,7 @@ import json
 import json
 import logging
 import socket
+import threading
 from cam import Camera
 
 class IpcCamera(object):
