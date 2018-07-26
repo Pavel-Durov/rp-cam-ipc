@@ -2,13 +2,15 @@ import os
 import sys
 import time
 import logging
-import fs_util
+from fs.util import generate_H264_absolute_file_name, generate_JPEG_absolute_file_name
 import picamera
 import datetime
 
 class Camera(object):
     RECORDING_TIME_MIN_SEC = 1
-    
+    CAM_RESOLUTION = (1024, 768)
+    CAM_FRAMERATE = 30
+
     def __init__(self, motionDetection):
         self.logger = logging.getLogger('Camera')
         self.motionDetection = motionDetection
@@ -20,8 +22,8 @@ class Camera(object):
         self.cam.close()
 
     def set_config(self):
-        self.cam.resolution = (1024, 768)
-        self.cam.framerate = 30
+        self.cam.resolution = self.CAM_RESOLUTION
+        self.cam.framerate = self.CAM_FRAMERATE
     
     def capture(self, num):
         result = []
@@ -30,7 +32,7 @@ class Camera(object):
             file_path = None
             try:
                 self.logger.info('captire in progress')
-                file_path = fs_util.generate_img_path(fs_util.IMG_GENERAL)
+                file_path = generate_img_path(fs_util.IMG_GENERAL)
                 self.cam.capture(file_path, use_video_port=True)
                 result.append(file_path)
             except:
@@ -48,7 +50,7 @@ class Camera(object):
     def video(self, sec):
         path = None
         try:
-            path = fs_util.generate_video_path(fs_util.VIDEO_GENERAL)
+            path = generate_video_path(fs_util.VIDEO_GENERAL)
             sec = self.__normalize_rec_time(sec)
             self.logger.info('recording started, {}, {} sec'.format(path, sec))
             self.cam.start_recording(path)

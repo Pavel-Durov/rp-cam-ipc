@@ -1,14 +1,15 @@
-import json
 import os
 import time
-import pathlib
+import json
 import calendar
 
 IPC_CONST_JSON_FILE = 'app/core/ipc-const.json'
 IPC_EVENTS_JSON_FILE = 'app/core/events.json'
 
+MP4_EXTENTION = '.mp4'
 H264_EXTENTION = '.h264'
 JPEG_EXTENTION = '.jpg'
+
 MEDIA_DIR = 'app/media/'
 CAT_FACIAL = 'cat_facial'
 HUMAN_FACIAL = 'human_facial'
@@ -29,9 +30,6 @@ def get_ipc_events():
         jEvent = json.load(f)
         return jEvent
 
-def __generate_file_name(ext):
-    return __get_timestamp_str() + ext
-
 def __get_timestamp_str():
     return str(calendar.timegm(time.gmtime()))
 
@@ -44,25 +42,33 @@ def __get_dir_names():
             MOTION_DETECTION,
             VIDEO]
 
-def __create_dir(name):
-    full_path = os.path.join(MEDIA_DIR, name)
-    pathlib.Path(full_path).mkdir(parents=True, exist_ok=True)
+def __create_media_sub_dir(name):
+    path = os.path.join(MEDIA_DIR, name)
+    __create_dir(path)
 
-def __create_meda_dir():
-    pathlib.Path(MEDIA_DIR).mkdir(parents=True, exist_ok=True)
+def __create_dir(dir_path):
+    os.makedirs(dir_path, exist_ok=True);
 
 def create_dirs():
+    __create_dir(MEDIA_DIR)
     for dir_name in __get_dir_names():
-        __create_dir(dir_name)
+        __create_media_sub_dir(dir_name)
 
-def __append_full_path(media_file):
-    directory = os.path.join(os.getcwd(), MEDIA_DIR, dir_type)
-    return os.path.join(directory, name)
-
-def generate_img_path(dir_type):
+def generate_JPEG_absolute_file_name(dir_type):
     name = __generate_file_name(JPEG_EXTENTION)
-    return __append_full_path(name)
+    return __append_full_path(name, dir_type)
 
-def generate_video_path(dur_type):
+def generate_H264_absolute_file_name(dir_type):
     name = __generate_file_name(H264_EXTENTION)
-    return __append_full_path(name)
+    return __append_full_path(name, dir_type)
+
+def generate_MP4_absolute_file_name(dir_type):
+    name = __generate_file_name(MP4_EXTENTION)
+    return __append_full_path(name, dir_type)
+
+def __append_full_path(media_file, dir_type):
+    directory = os.path.join(os.getcwd(), MEDIA_DIR, dir_type)
+    return os.path.join(directory, media_file)
+
+def __generate_file_name(ext):
+    return __get_timestamp_str() + ext
