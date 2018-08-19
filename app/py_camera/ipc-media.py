@@ -6,8 +6,8 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
 
 def start(ipc_socket, ipc_event):
     create_dirs()
-    media = IpcMedia(ipc_socket, ipc_event)
-    media.run()
+    media = IpcMedia()
+    media.run(ipc_socket, ipc_event)
     
 if __name__ == '__main__':
     ipcConst = get_ipc_const()

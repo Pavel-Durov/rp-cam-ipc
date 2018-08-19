@@ -7,17 +7,16 @@ import socket
 import threading
 from threading import Thread, Lock
 from ipc.client import IpcClient
-#from rp.camera import Camera
+from rp.camera import Camera
 
 class IpcMedia(Thread):
     OUTGOING_MESSAGES = []
     INCOMING_MESSAGES = []
-
-    def __init__(self, socket, ipc_events):
-        self.ipc_socket = socket
-        #self.cam = Camera(self.motion_detected)
+    MOTION_DETECTION_VIDEO_LENGTH_SEC = 15
+    
+    def __init__(self):
+        self.cam = Camera(self.motion_detected)
         self.logger = logging.getLogger('IpcCamera')
-        self.ipc_events = ipc_events
         self.outgoing_messages_lock = Lock()
         self.incoming_messages_lock = Lock()
     
@@ -27,19 +26,17 @@ class IpcMedia(Thread):
     def capture(self, cmd):
         self.logger.info('RECIEVED RPCAM_CAPTURE', cmd)
         time.sleep(5)
-        result = ['https://chocolatey.org/content/packageimages/nodejs.10.7.0.png']
-        #self.cam.capture(cmd['num'])
+        result = self.cam.capture(cmd['num'])
         self.add_message(self.ipc_events['RPCAM_CAPTURE_READY'], result)
 
     def record(self, cmd):
         self.logger.info('RECIEVED RPCAM_VIDEO_RECORD', cmd)
-        result = 'https://raw.githubusercontent.com/mediaelement/mediaelement-files/master/big_buck_bunny.mp4'
-        #self.cam.video(cmd['sec'])
+        result = self.cam.video(cmd['sec'])
         self.add_message(self.ipc_events['RPCAM_VIDEO_RECORD_READY'], result)
 
     def motion_detected(self):
         self.logger.info('RPCAM_MOTION_DETECTED')
-        result = ''#self.cam.video(15)
+        result = self.cam.video(self.MOTION_DETECTION_VIDEO_LENGTH_SEC)
         self.add_message(self.ipc_events['RPCAM_MOTION_DETECTED'], result)
 
     
@@ -70,7 +67,9 @@ class IpcMedia(Thread):
                 cmd = self.INCOMING_MESSAGES.pop()
                 self.parce_cmd(cmd)
                       
-    def run(self):
+    def run(self, ipc_socket, ipc_events):
+        self.ipc_socket = ipc_socket
+        self.ipc_events = ipc_events
         self.running = True
         with IpcClient(self.ipc_socket) as client:
             client.incomeObservable.subscribe(self.accept_event)
