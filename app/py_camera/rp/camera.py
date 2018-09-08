@@ -8,6 +8,7 @@ import datetime
 RP_CONTEXT = True
 try:
     import picamera
+    import picamera.array
 except ImportError:
     RP_CONTEXT = False
 
