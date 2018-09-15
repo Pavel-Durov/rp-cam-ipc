@@ -5,14 +5,15 @@
     "main": "index.js",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
+        "test:py": "python3 -m unittest discover -s ./app/py_camera/ -p '*_test.py'",
         "start:ipc-server": "pm2 start app/server/server.js --name piCam-IPC-Server",
         "stop:ipc-server": "pm2 stop piCam-IPC-Server",
         "start:ipc-telegramBot": "pm2 start app/telegram/ipc-bot.js --name piCam-IPC-TelegramBot",
         "stop:ipc-telegramBot": "pm2 stop piCam-IPC-TelegramBot",
-        "start:ipc-py_cam": "python3 app/py_camera/ipc-camera.py",
-        "stop:ipc-py_cam": "pkill -f ipc_camera.py",
+        "start:ipc-media": "python3 app/py_camera/ipc-media.py",
+        "stop:ipc-media": "pkill -f ipc-media.py",
         "stop": "npm-run-all -p stop:ipc-server stop:ipc-telegramBot stop:ipc-py_cam",
-        "start": "npm-run-all -s start:ipc-server start:ipc-telegramBot start:ipc-py_cam"
+        "start": "npm-run-all -s start:ipc-server start:ipc-telegramBot start:ipc-media"
     },
     "author": "Pavel Durov",
     "license": "ISC",
