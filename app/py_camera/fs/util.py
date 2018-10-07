@@ -54,7 +54,7 @@ def __create_dir(dir_path):
 def create_dirs():
   __create_dir(MEDIA_DIR)
   for dir_name in __get_dir_names():
-    path = os.path.join(MEDIA_DIR, name)
+    path = os.path.join(MEDIA_DIR, dir_name)
     __create_dir(path)
 
 
