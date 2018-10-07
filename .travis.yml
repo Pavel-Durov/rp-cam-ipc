@@ -4,6 +4,7 @@ node_js:
   - "8.12.0"
 install:
   - npm install
+  - pyenv global 3.6.3
   - pip3 install rx
 script:
 - npm test
