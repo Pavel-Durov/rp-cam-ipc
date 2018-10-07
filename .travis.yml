@@ -4,6 +4,6 @@ node_js:
   - "8.12.0"
 install:
   - npm install
-  - pip3 install rx
+  - pip install rx
 script:
 - npm test
