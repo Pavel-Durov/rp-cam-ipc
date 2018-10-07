@@ -13,7 +13,7 @@
     "stop:ipc-telegramBot": "pm2 stop piCam-IPC-TelegramBot",
     "start:ipc-media": "python3 app/py_camera/ipc-media.py",
     "stop:ipc-media": "pkill -f ipc-media.py",
-    "stop": "npm-run-all -p stop:ipc-server stop:ipc-telegramBot stop:ipc-py_cam",
+    "stop": "npm-run-all -p stop:ipc-server stop:ipc-telegramBot stop:ipc-media",
     "start": "npm-run-all -s start:ipc-server start:ipc-telegramBot start:ipc-media"
   },
   "author": "Pavel Durov",
