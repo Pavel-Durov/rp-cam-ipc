@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "mocha  \"app/**/*.spec.js\"",
+    "test": "npm-run-all -p test:js test:py",
+    "test:js": "mocha 'app/**/*.spec.js'",
     "test:py": "python3 -m unittest discover -s ./app/py_camera/ -p '*_test.py'",
     "start:ipc-server": "pm2 start app/server/ipc-server.js --name piCam-IPC-Server",
     "stop:ipc-server": "pm2 stop piCam-IPC-Server",
