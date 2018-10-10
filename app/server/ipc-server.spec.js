@@ -1,81 +1,80 @@
 
-const server = require('./ipc-server');
 const ipc = require('node-ipc');
-const ipcConst = require('../core/ipc-const.json')
-const ipcEvents = require('../core/events.json');
+const {
+  RPCAM_SERRVER_ID,
+  RPCAM_CAPTURE_SOCKET
+} = require('../core/ipc-const.json')
+const {
+  CONNECT,
+  RPCAM_CAPTURE_READY,
+  RPCAM_CAPTURE,
+  RPCAM_VIDEO_RECORD,
+  RPCAM_VIDEO_RECORD_READY
+} = require('../core/events.json');
 
 var expect = require('chai').expect;
 
-describe(`ipc server, ${ipcConst.RPCAM_SERRVER_ID}, ${ipcConst.RP_CAM_CAPTURE_SOCKET}`, () => {
-
-  var connected = false;
-
-  before(() => {
-    return new Promise((resolve) => {
-      ipc.log = () => { };
-      ipc.connectTo(ipcConst.RPCAM_SERRVER_ID, ipcConst.RP_CAM_CAPTURE_SOCKET, () => {
-        ipc.of[ipcConst.RPCAM_SERRVER_ID].on(ipcEvents.CONNECT, () => {
-          connected = true;
-          resolve();
-        });
-      });
+describe(`ipc server, ${RPCAM_SERRVER_ID}, ${RPCAM_CAPTURE_SOCKET}`, () => {
+  let server;
+  after((done) => {
+    server.on("disconnect", () => {
+      connected = false;
+      done();
     });
-  })
-
-  after(() => {
-    connected = false;
-    return ipc.disconnect(ipcConst.RPCAM_SERRVER_ID);
+    ipc.disconnect(RPCAM_SERRVER_ID);
   });
 
-  it(`connect to ${ipcConst.RPCAM_SERRVER_ID}, ${ipcConst.RP_CAM_CAPTURE_SOCKET}`, () => {
-    expect(connected).to.be.eq(true);
+  before(`connect to ${RPCAM_SERRVER_ID}, ${RPCAM_CAPTURE_SOCKET}`, (done) => {
+    ipc.log = () => { };
+    ipc.connectTo(RPCAM_SERRVER_ID, RPCAM_CAPTURE_SOCKET, () => {
+      server = ipc.of[RPCAM_SERRVER_ID];
+      server.on(CONNECT, () => done());
+    });
   });
 
-  it(`RPCAM_CAPTURE emit & recive`, done => {
-    const msg = 'capture-event-message';
-    testIpcEvent(ipcEvents.RPCAM_CAPTURE, msg).then((msg) => {
-      expect(msg).to.be.eq(msg);
-      done();
-    })
+  it(`events should be strings`, () => {
+    const nonStrings = [
+      RPCAM_CAPTURE_READY,
+      RPCAM_CAPTURE,
+      RPCAM_CAPTURE_READY,
+      RPCAM_VIDEO_RECORD,
+      RPCAM_VIDEO_RECORD_READY
+    ].filter(s => typeof s !== 'string');
+    expect(nonStrings).to.be.empty;
   });
 
-  it(`RPCAM_CAPTURE_READY emit & recive`, done => {
-    const msg = 'capture-ready-event-message'
-    testIpcEvent(ipcEvents.RPCAM_CAPTURE_READY).then((msg) => {
-      expect(msg).to.be.eq(msg);
-      done();
-    })
+  it(`${RPCAM_CAPTURE_READY} event test`, async () => {
+    const response = await testIpcEvent(RPCAM_CAPTURE_READY, 1);
+    expect(1).to.be.eql(response);
   });
 
-  it(`RPCAM_VIDEO_RECORD emit & recive`, done => {
-    const msg = 'vide-record-event-message'
-    testIpcEvent(ipcEvents.RPCAM_VIDEO_RECORD).then((msg) => {
-      expect(msg).to.be.eq(msg);
-      done();
-    })
+  it(`${RPCAM_CAPTURE} event test`, async () => {
+    const response = await testIpcEvent(RPCAM_CAPTURE, 2);
+    expect(2).to.be.eql(response);
   });
 
-  it(`RPCAM_VIDEO_RECORD_READY emit & recive`, done => {
-    const msg = 'video-record-ready-message'
-    testIpcEvent(ipcEvents.RPCAM_VIDEO_RECORD_READY, msg).then((msg) => {
-      expect(msg).to.be.eq(msg);
-      done();
-    })
+  it(`${RPCAM_CAPTURE_READY} event test`, async () => {
+    const response = await testIpcEvent(RPCAM_CAPTURE_READY, 3);
+    expect(3).to.be.eql(response);
   });
 
-  it(`RPCAM_MOTION_DETECTED emit & recive`, done => {
-    const msg = 'omg-motion-detected-messag';
-    testIpcEvent(ipcEvents.RPCAM_MOTION_DETECTED).then((msg) => {
-      expect(msg).to.be.eq(msg);
-      done();
-    })
+  it(`${RPCAM_VIDEO_RECORD} event test`, async () => {
+    const response = await testIpcEvent(RPCAM_VIDEO_RECORD, 4);
+    expect(4).to.be.eql(response);
+  });
+
+  it(`${RPCAM_VIDEO_RECORD_READY} event test`, async () => {
+    const response = await testIpcEvent(RPCAM_VIDEO_RECORD_READY, 5);
+    expect(5).to.be.eql(response);
   });
 });
 
-function testIpcEvent(eventName, msg) {
-  return new Promise((resolve, reject) => {
-    ipc.of[ipcConst.RPCAM_SERRVER_ID].on(eventName, resolve);
-    ipc.of[ipcConst.RPCAM_SERRVER_ID].emit(eventName, msg);
+async function testIpcEvent(eventName, dispatchMsg) {
+  return new Promise((resolve) => {
+    ipc.of[RPCAM_SERRVER_ID].on(eventName, function (msg) {
+      resolve(msg);
+    });
+    ipc.of[RPCAM_SERRVER_ID].emit(eventName, dispatchMsg);
   });
 }
 

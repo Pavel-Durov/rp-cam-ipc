@@ -5,7 +5,7 @@ const ipcConst = require('../core/ipc-const.json')
 ipc.config.id = ipcConst.RPCAM_SERRVER_ID;
 ipc.config.retry = ipcConst.RPCAM_SERRVER_RETRY;
 
-ipc.serve(ipcConst.RP_CAM_CAPTURE_SOCKET, () => {
+ipc.serve(ipcConst.RPCAM_CAPTURE_SOCKET, () => {
   ipc.server.on(events.RPCAM_CAPTURE, (data) => {
     ipc.server.broadcast(events.RPCAM_CAPTURE, data);
   });

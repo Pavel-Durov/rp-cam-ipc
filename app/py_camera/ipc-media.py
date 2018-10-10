@@ -15,4 +15,4 @@ def start(ipc_socket, ipc_event):
 if __name__ == '__main__':
   ipcConst = get_ipc_const()
   events = get_ipc_events()
-  start(ipcConst['RP_CAM_CAPTURE_SOCKET'], events)
+  start(ipcConst['RPCAM_CAPTURE_SOCKET'], events)

@@ -24,7 +24,7 @@ const botIpcBridge = {
   }
 };
 
-ipc.connectTo(ipcConst.RPCAM_SERRVER_ID, ipcConst.RP_CAM_CAPTURE_SOCKET, () => {
+ipc.connectTo(ipcConst.RPCAM_SERRVER_ID, ipcConst.RPCAM_CAPTURE_SOCKET, () => {
   const server = ipc.of[ipcConst.RPCAM_SERRVER_ID];
   server.on(ipcEvents.CONNECT, () => {
     telegram_bot.start(botIpcBridge)
