@@ -8,7 +8,7 @@ class TestingFsUtils(unittest.TestCase):
   def test_ipc_const(self):
     ipc_const = util.get_ipc_const()
     self.assertTrue("RPCAM_SERRVER_ID" in ipc_const)
-    self.assertTrue("RP_CAM_CAPTURE_SOCKET" in ipc_const)
+    self.assertTrue("RPCAM_CAPTURE_SOCKET" in ipc_const)
 
   def test_ipc_events(self):
     ipc_events = util.get_ipc_events()

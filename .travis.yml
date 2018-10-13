@@ -1,0 +1,13 @@
+language: node_js
+sudo: false
+node_js:
+  - "8.12.0"
+env:
+    - TELEGRAM_BOT_TOKEN=123:TEST
+install:
+  - npm install
+  - pyenv global 3.6.3
+  - pip3 install rx
+script:
+  - npm test
+  - npm run lint

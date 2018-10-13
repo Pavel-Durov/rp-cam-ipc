@@ -1,6 +1,6 @@
 const telegram = require('telegram-bot-api');
 const commands = require('./commands');
-const logger = require('../core/logger');
+const log = require('debug')('bot');
 const LOG_TAG = 'TELEGRAM_BOT';
 
 
@@ -10,7 +10,7 @@ const STR = {
   UNSUB_SUCCESS: 'Sad to see you leaving...',
   SUB_FAIL_EXIST: 'Ooops, already subscribed 😞',
   UNKNOWN_CMD: 'UNKNOWN COMMAND 😠'
-}
+};
 
 const bot = {
   SUBSCRIBERS: [],
@@ -39,8 +39,11 @@ const bot = {
   },
   sendImage: imgPaths => {
     (imgPaths || []).forEach(path => {
-      bot.notifySubscribers(id => bot.api.sendPhoto({ chat_id: id, caption: 'This is a test caption', photo: path }))
-    })
+      bot.notifySubscribers(id => bot.api.sendPhoto({
+        chat_id: id,
+        caption: 'This is a test caption', photo: path
+      }));
+    });
   },
   sendVideo: (path, caption) => {
     bot.notifySubscribers(id => bot.api.sendVideo({ chat_id: id, caption: caption, video: path }));
@@ -48,8 +51,8 @@ const bot = {
   notifySubscribers: func => {
     bot.SUBSCRIBERS.forEach(id => {
       func(id)
-        .then(data => logger.error(LOG_TAG, data))
-        .catch(err => logger.error(LOG_TAG, err))
+        .then(data => log(LOG_TAG, data))
+        .catch(err => log(LOG_TAG, err));
     });
   },
   start: botIpc => {
@@ -66,9 +69,8 @@ const bot = {
       bot.start_listening();
     });
   },
-  start_listening: _ => {
+  start_listening: () => {
     bot.api.on('message', message => {
-      const chat_id = message.chat.id;
       const cmd = commands.parse(message.text);
       if (cmd) {
         cmd.action(message, bot);
@@ -77,6 +79,6 @@ const bot = {
       }
     });
   }
-}
+};
 
 module.exports = bot;
