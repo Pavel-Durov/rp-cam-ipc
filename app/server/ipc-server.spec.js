@@ -1,4 +1,5 @@
 
+const { stop } = require('../server/ipc-server');
 const ipc = require('node-ipc');
 const {
   RPCAM_SERRVER_ID,
@@ -22,6 +23,7 @@ describe(`ipc server, ${RPCAM_SERRVER_ID}, ${RPCAM_CAPTURE_SOCKET}`, () => {
       done();
     });
     ipc.disconnect(RPCAM_SERRVER_ID);
+    stop();
   });
 
   before(`connect to ${RPCAM_SERRVER_ID}, ${RPCAM_CAPTURE_SOCKET}`, (done) => {

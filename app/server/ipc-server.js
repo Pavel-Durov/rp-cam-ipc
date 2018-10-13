@@ -24,3 +24,9 @@ ipc.serve(ipcConst.RPCAM_CAPTURE_SOCKET, () => {
 });
 
 ipc.server.start();
+
+module.exports = {
+  stop: () => {
+    ipc.server.stop();
+  }
+};
