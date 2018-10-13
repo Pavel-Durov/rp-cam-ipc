@@ -28,7 +28,6 @@ describe(`ipc server, ${RPCAM_SERRVER_ID}, ${RPCAM_CAPTURE_SOCKET}`, () => {
   });
 
   before(`connect to ${RPCAM_SERRVER_ID}, ${RPCAM_CAPTURE_SOCKET}`, (done) => {
-    ipc.log = () => { };
     ipc.connectTo(RPCAM_SERRVER_ID, RPCAM_CAPTURE_SOCKET, () => {
       server = ipc.of[RPCAM_SERRVER_ID];
       server.on(CONNECT, () => done());

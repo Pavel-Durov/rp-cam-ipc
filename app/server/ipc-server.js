@@ -1,4 +1,5 @@
 const ipc = require('node-ipc');
+const log = require('debug')('ipc:server');
 const events = require('../core/events.json');
 const {
   RPCAM_SERRVER_ID,
@@ -8,6 +9,7 @@ const {
 
 ipc.config.id = RPCAM_SERRVER_ID;
 ipc.config.retry = RPCAM_SERRVER_RETRY;
+ipc.config.logger = (a) => log(a);
 
 ipc.serve(RPCAM_CAPTURE_SOCKET, () => {
   ipc.server.on(events.RPCAM_CAPTURE, (data) => {

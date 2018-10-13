@@ -1,5 +1,5 @@
 const R = require('ramda');
-const log = require('debug')('commands');
+const log = require('debug')('bot:commands');
 const LOG_TAG = 'CMD';
 
 function generateCmdList() {

@@ -1,7 +1,7 @@
 const ipc = require('node-ipc');
 const ipcEvents = require('../core/events.json');
 const telegram_bot = require('./bot');
-const log = require('debug')('ipc-bot');
+const log = require('debug')('ipc:bot');
 const ipcConst = require('../core/ipc-const.json');
 
 ipc.config.id = 'telegram_bot';
