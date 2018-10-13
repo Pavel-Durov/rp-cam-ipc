@@ -9,4 +9,5 @@ install:
   - pyenv global 3.6.3
   - pip3 install rx
 script:
-- npm test
+  - npm test
+  - npm run lint

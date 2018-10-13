@@ -1,10 +1,12 @@
 
 const { stop } = require('../server/ipc-server');
 const ipc = require('node-ipc');
+
 const {
   RPCAM_SERRVER_ID,
   RPCAM_CAPTURE_SOCKET
-} = require('../core/ipc-const.json')
+} = require('../core/ipc-const.json');
+
 const {
   CONNECT,
   RPCAM_CAPTURE_READY,
@@ -18,8 +20,7 @@ var expect = require('chai').expect;
 describe(`ipc server, ${RPCAM_SERRVER_ID}, ${RPCAM_CAPTURE_SOCKET}`, () => {
   let server;
   after((done) => {
-    server.on("disconnect", () => {
-      connected = false;
+    server.on('disconnect', () => {
       done();
     });
     ipc.disconnect(RPCAM_SERRVER_ID);
@@ -34,7 +35,7 @@ describe(`ipc server, ${RPCAM_SERRVER_ID}, ${RPCAM_CAPTURE_SOCKET}`, () => {
     });
   });
 
-  it(`events should be strings`, () => {
+  it('events should be strings', () => {
     const nonStrings = [
       RPCAM_CAPTURE_READY,
       RPCAM_CAPTURE,
