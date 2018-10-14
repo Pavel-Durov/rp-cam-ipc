@@ -4,6 +4,8 @@ import time
 import logging
 import fs.util as fs
 import datetime
+import numpy as np
+from threading import Thread
 
 RP_CONTEXT = True
 try:
@@ -18,9 +20,9 @@ class Camera(object):
   CAM_RESOLUTION = (1024, 768)
   CAM_FRAMERATE = 30
 
-  def __init__(self, motionDetection):
+  def __init__(self, on_motion_detected):
     self.logger = logging.getLogger('Camera')
-    self.motionDetection = motionDetection
+    self.on_motion_detected = on_motion_detected
     if RP_CONTEXT:
       self.cam = picamera.PiCamera()
     else:
@@ -82,55 +84,37 @@ class Camera(object):
       path = self.convert(path)
       if not RP_CONTEXT:
         path = '/home/ubuntu/workspace/app/media/test/big_buck_bunny.mp4'
-
     except:
       self.logger.error(sys.exc_info())
-
     return path
 
-  def start_motion_detection(self):
+  def detect_motion(self, sec):
     try:
-      with MotionDetector(self.cam) as detector:
-        self.cam.start_recording(
-            '/dev/null', format='h264', motion_output=detector)
-        while True:
-          while not detector.is_detected:
-            self.logger.info('waiting for motion...')
-            self.cam.wait_recording(1)
-
+      self.logger.info('motion_detection: started')
+      with MotionDetector(self.cam) as output:
+        self.logger.info('motion_detection: start_recording')
+        self.cam.start_recording('/dev/null', format='h264', motion_output=output)
+        self.cam.wait_recording(sec)
         self.cam.stop_recording()
+        if(output.motion_detected):
+          self.on_motion_detected()
     except:
       self.logger.error(sys.exc_info())
 
-
 if RP_CONTEXT:
+  # Source: https://picamera.readthedocs.io/en/release-1.10/api_array.html
   class MotionDetector(picamera.array.PiMotionAnalysis):
-    STILL_INTEVAL_MIN = 5
-    __motion_detected = False
-
-    def __init__(self):
-      self.logger = logging.getLogger('MotionDetector')
-      last_still_capture_time = datetime.datetime.now()
-
-    def is_detected(self):
-      return self.__motion_detected
-
-    def time_diff(self):
-      delta = datetime.timedelta(seconds=self.STILL_INTEVAL_MIN)
-      return datetime.datetime.now() > self.last_still_capture_time + delta
-
+    motion_detected = False
     def analyse(self, a):
-      self.__motion_detected = False
-      if self.time_diff():
-        self.last_still_capture_time = datetime.datetime.now()
-        x = np.square(a['x'].astype(np.float))
-        y = np.square(a['y'].astype(np.float))
+      a = np.sqrt(
+          np.square(a['x'].astype(np.float)) +
+          np.square(a['y'].astype(np.float))
+          ).clip(0, 255).astype(np.uint8)
+      # If there're more than 10 vectors with a magnitude greater
+      # than 60, then say we've detected motion
+      if (a > 60).sum() > 10:
+        self.motion_detected = True
 
-        a = np.sqrt(x + y).clip(0, 255).astype(np.uint8)
-
-        if (a > 60).sum() > 10:
-          self.logger.info('motion detected')
-          self.__motion_detected = True
 else:
   class MockedCamera(object):
     resolution = 0
