@@ -1,6 +1,7 @@
 const telegram = require('telegram-bot-api');
 const commands = require('./commands');
 const log = require('debug')('bot');
+const fs = require('fs');
 
 const STR = {
   SUB_SUCCESS: 'Thanks for subscribing👍',
@@ -9,6 +10,14 @@ const STR = {
   SUB_FAIL_EXIST: 'Ooops, already subscribed 😞',
   UNKNOWN_CMD: 'UNKNOWN COMMAND 😠'
 };
+
+function deleteFile(path) {
+  log(`Deleting file, ${path}`);
+  fs.unlink(path, (err) => {
+    if (err) throw err;
+    log(`${path} was deleted`);
+  });
+}
 
 const bot = {
   SUBSCRIBERS: [],
@@ -36,22 +45,28 @@ const bot = {
     }
   },
   sendImage: imgPaths => {
-    (imgPaths || []).forEach(path => {
-      bot.notify(id => bot.api.sendPhoto({
-        chat_id: id,
-        caption: 'This is a test caption', photo: path
-      }));
+    (imgPaths || []).forEach(async path => {
+      await bot.notify(async function (id) {
+        return bot.api.sendPhoto({
+          chat_id: id,
+          caption: (new Date()).toLocaleString(),
+          photo: path
+        });
+      });
     });
   },
-  sendVideo: (path, caption) => {
-    bot.notify(id => bot.api.sendVideo({ chat_id: id, caption: caption, video: path }));
+  sendVideo: async (path, caption) => {
+    await bot.notify(async function (id) {
+      return bot.api.sendVideo({ chat_id: id, caption: caption, video: path });
+    });
+    deleteFile(path);
   },
   onMotionDetected: (path) => {
     bot.sendVideo(path, '🕵️ Motion Detected');
   },
   notify: func => {
     log('notify,', bot.SUBSCRIBERS);
-    (bot.SUBSCRIBERS || []).forEach(async (id) => {
+    const promises = (bot.SUBSCRIBERS || []).map(async (id) => {
       try {
         const data = await func(id);
         log(data);
@@ -59,6 +74,7 @@ const bot = {
         log(e);
       }
     });
+    return Promise.all(promises);
   },
   start: botIpc => {
     bot.ips = botIpc;
