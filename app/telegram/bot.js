@@ -1,8 +1,6 @@
 const telegram = require('telegram-bot-api');
 const commands = require('./commands');
 const log = require('debug')('bot');
-const LOG_TAG = 'TELEGRAM_BOT';
-
 
 const STR = {
   SUB_SUCCESS: 'Thanks for subscribing👍',
@@ -48,8 +46,8 @@ const bot = {
   sendVideo: (path, caption) => {
     bot.notify(id => bot.api.sendVideo({ chat_id: id, caption: caption, video: path }));
   },
-  onMotionDetected: (path) =>{
-    bot.sendVideo(path, `🕵️ Motion Deetected`);
+  onMotionDetected: (path) => {
+    bot.sendVideo(path, '🕵️ Motion Detected');
   },
   notify: func => {
     log('notify,', bot.SUBSCRIBERS);
@@ -57,7 +55,7 @@ const bot = {
       try {
         const data = await func(id);
         log(data);
-      }catch(e){
+      } catch (e) {
         log(e);
       }
     });
