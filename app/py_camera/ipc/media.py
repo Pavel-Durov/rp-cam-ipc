@@ -10,14 +10,14 @@ from ipc.client import IpcClient
 from rp.camera import Camera
 
 
-class IpcMedia(Thread):
+class Media():
   OUTGOING_MESSAGES = []
   INCOMING_MESSAGES = []
   MOTION_DETECTION_VIDEO_LENGTH_SEC = 15
 
   def __init__(self):
     self.cam = Camera(self.motion_detected)
-    self.logger = logging.getLogger('IpcCamera')
+    self.logger = logging.getLogger('ipc-media')
     self.outgoing_messages_lock = Lock()
     self.incoming_messages_lock = Lock()
 
@@ -28,18 +28,18 @@ class IpcMedia(Thread):
   def capture(self, cmd):
     self.logger.info('RECIEVED RPCAM_CAPTURE', cmd)
     time.sleep(5)
-    result = self.cam.capture(cmd['num'])
-    self.add_message(self.ipc_events['RPCAM_CAPTURE_READY'], result)
+    payload = self.cam.capture(cmd['num'])
+    self.add_message(self.ipc_events['RPCAM_CAPTURE_READY'], payload)
 
   def record(self, cmd):
     self.logger.info('RECIEVED RPCAM_VIDEO_RECORD', cmd)
-    result = self.cam.video(cmd['sec'])
-    self.add_message(self.ipc_events['RPCAM_VIDEO_RECORD_READY'], result)
+    payload = self.cam.video(cmd['sec'])
+    self.add_message(self.ipc_events['RPCAM_VIDEO_RECORD_READY'], payload)
 
   def motion_detected(self):
     self.logger.info('RPCAM_MOTION_DETECTED')
-    result = self.cam.video(self.MOTION_DETECTION_VIDEO_LENGTH_SEC)
-    self.add_message(self.ipc_events['RPCAM_MOTION_DETECTED'], result)
+    payload = self.cam.video(5)
+    self.add_message(self.ipc_events['RPCAM_MOTION_DETECTED'], payload)
 
   def parce_cmd(self, cmd):
     self.logger.info(cmd)
@@ -81,4 +81,5 @@ class IpcMedia(Thread):
           self.dispatch_outstanding(client)
           self.process_incomming()
         finally:
+          self.cam.detect_motion(5)
           time.sleep(1)

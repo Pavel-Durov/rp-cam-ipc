@@ -5,4 +5,11 @@
   "python.formatting.autopep8Args": [
     "--indent-size=2"
   ],
+  "python.pythonPath": "usr/bin/python",
+  "files.exclude": {
+    "**/*.pyc": {
+      "when": "$(basename).py"
+    },
+    "**/__pycache__": true
+  }
 }

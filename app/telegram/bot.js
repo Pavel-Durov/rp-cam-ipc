@@ -1,8 +1,6 @@
 const telegram = require('telegram-bot-api');
 const commands = require('./commands');
 const log = require('debug')('bot');
-const LOG_TAG = 'TELEGRAM_BOT';
-
 
 const STR = {
   SUB_SUCCESS: 'Thanks for subscribing👍',
@@ -19,7 +17,7 @@ const bot = {
   takeImage: num => bot.ips.capture(num),
   recordVideo: sec => bot.ips.recordVideo(sec),
   sendMessage: msg => {
-    bot.notifySubscribers(id => bot.api.sendMessage({ chat_id: id, text: msg }));
+    bot.notify(id => bot.api.sendMessage({ chat_id: id, text: msg }));
   },
   subscribe: id => {
     let msg = STR.SUB_SUCCESS;
@@ -39,20 +37,27 @@ const bot = {
   },
   sendImage: imgPaths => {
     (imgPaths || []).forEach(path => {
-      bot.notifySubscribers(id => bot.api.sendPhoto({
+      bot.notify(id => bot.api.sendPhoto({
         chat_id: id,
         caption: 'This is a test caption', photo: path
       }));
     });
   },
   sendVideo: (path, caption) => {
-    bot.notifySubscribers(id => bot.api.sendVideo({ chat_id: id, caption: caption, video: path }));
+    bot.notify(id => bot.api.sendVideo({ chat_id: id, caption: caption, video: path }));
   },
-  notifySubscribers: func => {
-    bot.SUBSCRIBERS.forEach(id => {
-      func(id)
-        .then(data => log(LOG_TAG, data))
-        .catch(err => log(LOG_TAG, err));
+  onMotionDetected: (path) => {
+    bot.sendVideo(path, '🕵️ Motion Detected');
+  },
+  notify: func => {
+    log('notify,', bot.SUBSCRIBERS);
+    (bot.SUBSCRIBERS || []).forEach(async (id) => {
+      try {
+        const data = await func(id);
+        log(data);
+      } catch (e) {
+        log(e);
+      }
     });
   },
   start: botIpc => {
@@ -72,6 +77,7 @@ const bot = {
   start_listening: () => {
     bot.api.on('message', message => {
       const cmd = commands.parse(message.text);
+      bot.sendMessage('PROCESSING 🤓');
       if (cmd) {
         cmd.action(message, bot);
       } else {

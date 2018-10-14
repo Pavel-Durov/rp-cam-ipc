@@ -1,6 +1,6 @@
 import logging
 from fs.util import get_ipc_const, get_ipc_events, create_dirs
-from ipc.media import IpcMedia
+from ipc.media import Media
 
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
@@ -8,7 +8,7 @@ logging.basicConfig(
 
 def start(ipc_socket, ipc_event):
   create_dirs()
-  media = IpcMedia()
+  media = Media()
   media.run(ipc_socket, ipc_event)
 
 

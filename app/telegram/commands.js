@@ -1,9 +1,17 @@
-const R = require('ramda');
+'use strict';
+
+const {
+  filter,
+  propEq,
+  compose,
+  head
+} = require('ramda');
+
 const log = require('debug')('bot:commands');
 const LOG_TAG = 'CMD';
 
 function generateCmdList() {
-  return cmdModule.list.map(c => `${c.cmd}:    ${c.description}`).join('\n');
+  return cmdModule.list.map(({cmd, description}) => `${cmd}:    ${description}`).join('\n');
 }
 
 const HELP_CMD = {
@@ -61,8 +69,8 @@ const INFO_CMD = {
   }
 };
 
-const filterCmd = str => R.filter(R.propEq('cmd', str), cmdModule.list);
-const locateCmd = R.compose(R.head, filterCmd);
+const filterCmd = str => filter(propEq('cmd', str), cmdModule.list);
+const locateCmd = compose(head, filterCmd);
 
 const cmdModule = {
   list: [HELP_CMD, IMG_CMD, VID_CMD, SUB_CMD, UNSUB_CMD, INFO_CMD],
