@@ -71,6 +71,8 @@ class Camera(object):
     except:
       self.logger.error(
           'Error on h264-mp4 convertion {}'.format(sys.exc_info()))
+    finally:
+      os.remove(path)
 
   def video(self, sec):
     path = None
