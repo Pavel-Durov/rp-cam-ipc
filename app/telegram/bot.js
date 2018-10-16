@@ -62,7 +62,7 @@ const bot = {
     deleteFile(path);
   },
   onMotionDetected: (path) => {
-    bot.sendVideo(path, '🕵️ Motion Detected');
+    bot.sendVideo(path, `🕵️ Motion Detected, ${(new Date()).toLocaleString()}`);
   },
   notify: func => {
     log('notify,', bot.SUBSCRIBERS);

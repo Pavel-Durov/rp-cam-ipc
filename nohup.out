@@ -1,0 +1,23 @@
+
+> workspace@1.0.0 stop /home/pi/projects/git-repos/rp-cam-ipc
+> npm-run-all -p stop:ipc-server stop:ipc-telegramBot stop:ipc-media
+
+
+> workspace@1.0.0 start /home/pi/projects/git-repos/rp-cam-ipc
+> npm-run-all -s start:ipc-server start:ipc-telegramBot start:ipc-media
+
+events.js:183
+      throw er; // Unhandled 'error' event
+      ^
+
+Error: EBADF: bad file descriptor, read
+npm ERR! code ELIFECYCLE
+npm ERR! errno 1
+npm ERR! workspace@1.0.0 start: `npm-run-all -s start:ipc-server start:ipc-telegramBot start:ipc-media`
+npm ERR! Exit status 1
+npm ERR! 
+npm ERR! Failed at the workspace@1.0.0 start script.
+npm ERR! This is probably not a problem with npm. There is likely additional logging output above.
+
+npm ERR! A complete log of this run can be found in:
+npm ERR!     /home/pi/.npm/_logs/2018-10-14T19_34_02_615Z-debug.log

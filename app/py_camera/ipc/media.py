@@ -13,9 +13,10 @@ from rp.camera import Camera
 class Media():
   OUTGOING_MESSAGES = []
   INCOMING_MESSAGES = []
-  MOTION_DETECTION_VIDEO_LENGTH_SEC = 15
+  MOTION_DETECTION_LENGTH_SEC = 15
 
-  def __init__(self):
+  def __init__(self, motion_detection_length_sec):
+    self.MOTION_DETECTION_LENGTH_SEC = motion_detection_length_sec
     self.cam = Camera(self.motion_detected)
     self.logger = logging.getLogger('ipc-media')
     self.outgoing_messages_lock = Lock()
@@ -36,10 +37,9 @@ class Media():
     payload = self.cam.video(cmd['sec'])
     self.add_message(self.ipc_events['RPCAM_VIDEO_RECORD_READY'], payload)
 
-  def motion_detected(self):
+  def motion_detected(self, path):
     self.logger.info('RPCAM_MOTION_DETECTED')
-    payload = self.cam.video(5)
-    self.add_message(self.ipc_events['RPCAM_MOTION_DETECTED'], payload)
+    self.add_message(self.ipc_events['RPCAM_MOTION_DETECTED'], path)
 
   def parce_cmd(self, cmd):
     self.logger.info(cmd)
@@ -81,5 +81,5 @@ class Media():
           self.dispatch_outstanding(client)
           self.process_incomming()
         finally:
-          self.cam.detect_motion(5)
+          self.cam.detect_motion(self.MOTION_DETECTION_LENGTH_SEC)
           time.sleep(1)
