@@ -1,5 +1,6 @@
 {
   "RPCAM_SERRVER_ID": "rpcam",
   "RPCAM_SERRVER_RETRY": 1500,
-  "RPCAM_CAPTURE_SOCKET": "/tmp/capture"
+  "RPCAM_CAPTURE_SOCKET": "/tmp/capture",
+  "RPCAM_MOTION_DETECTION_LENGTH_SEC": 15
 }
