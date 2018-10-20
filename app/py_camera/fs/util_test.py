@@ -9,6 +9,8 @@ class TestingFsUtils(unittest.TestCase):
     ipc_const = util.get_ipc_const()
     self.assertTrue("RPCAM_SERRVER_ID" in ipc_const)
     self.assertTrue("RPCAM_CAPTURE_SOCKET" in ipc_const)
+    self.assertTrue("RPCAM_SNAPSHOTS_PER_IMG_CMD" in ipc_const)
+    self.assertTrue("RPCAM_VIDEO_CMD_DURATION" in ipc_const)
 
   def test_ipc_events(self):
     ipc_events = util.get_ipc_events()
@@ -17,6 +19,7 @@ class TestingFsUtils(unittest.TestCase):
     self.assertTrue("RPCAM_VIDEO_RECORD" in ipc_events)
     self.assertTrue("RPCAM_VIDEO_RECORD_READY" in ipc_events)
     self.assertTrue("RPCAM_MOTION_DETECTED" in ipc_events)
+
 
   def test_generate_img_file_name(self):
     self.__file_path_test(util.IMG_GENERAL,

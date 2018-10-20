@@ -8,7 +8,6 @@ from rx import Observable, Observer
 
 
 class IpcClient():
-  INCOMING_MESSAGES = []
   incomeObservable = None
   incomeObserver = None
 
@@ -16,7 +15,7 @@ class IpcClient():
     self.logger = logging.getLogger('IpcClient')
     self.addr = server_address
     self.sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
-    self.recieve_msg = False
+    self.receive_msg = False
     self.messages_lock = Lock()
     self.incomeObservable = Observable.create(self.init_incomeObservable)
 
@@ -55,10 +54,10 @@ class IpcClient():
     strJson = re.sub(r'[\x0c]', '', str(response, 'UTF-8'))
     return json.loads(strJson)
 
-  def threadfunc(self):
-    self.recieve_msg = True
+  def ipc_client_routine(self):
+    self.receive_msg = True
     try:
-      while self.recieve_msg:
+      while self.receive_msg:
         msg = self.recieve()
         cmd = self.parse_json(msg)
         with self.messages_lock:
@@ -68,9 +67,9 @@ class IpcClient():
       self.logger.error(sys.exc_info())
 
   def stop(self):
-    self.recieve_msg = False
+    self.receive_msg = False
 
   def run(self):
-    th = Thread(target=self.threadfunc)
+    th = Thread(target=self.ipc_client_routine)
     th.daemon = True
     th.start()
