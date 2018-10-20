@@ -1,7 +1,7 @@
 const { expect } = require('chai');
 const {
   parse
-} = require('./commands');
+} = require('../telegram/commands');
 
 const {
   RPCAM_SNAPSHOTS_PER_IMG_CMD,
