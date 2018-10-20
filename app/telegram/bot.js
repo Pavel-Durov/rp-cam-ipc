@@ -1,5 +1,5 @@
 const telegram = require('telegram-bot-api');
-const commands = require('./commands');
+const { parse } = require('./commands');
 const log = require('debug')('bot');
 const fs = require('fs');
 
@@ -92,10 +92,11 @@ const bot = {
   },
   start_listening: () => {
     bot.api.on('message', message => {
-      const cmd = commands.parse(message.text);
+      const { chat: { id }, text } = message;
+      const cmd = parse(text);
       bot.sendMessage('PROCESSING 🤓');
       if (cmd) {
-        cmd.action(message, bot);
+        cmd.action(id, bot);
       } else {
         bot.sendMessage(STR.UNKNOWN_CMD);
       }

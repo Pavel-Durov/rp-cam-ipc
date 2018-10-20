@@ -1,45 +1,81 @@
-const expect = require('chai').expect;
-const commands = require('./commands');
+const { expect } = require('chai');
+const {
+  parse
+} = require('./commands');
+
+const {
+  RPCAM_SNAPSHOTS_PER_IMG_CMD,
+  RPCAM_VIDEO_CMD_DURATION
+} = require('../core/ipc-const');
 
 describe('telegram bot commands', () => {
-  it('/h command parse', () => {
-    const cmd = commands.parse('/h');
-    expect(cmd.cmd).to.be.eq('/h');
-    expect(cmd.action).to.be.not.eq(undefined);
-  });
+  function extractCmdAction(strCmd) {
+    const { cmd, action } = parse(strCmd);
+    expect(cmd).to.be.eq(strCmd);
+    expect(action).to.be.a('function');
+    return action;
+  }
 
-  it('/img command parse', () => {
-    const cmd = commands.parse('/img');
-    expect(cmd.cmd).to.be.eq('/img');
-    expect(cmd.action).to.be.not.eq(undefined);
-  });
+  describe('parse', () => {
+    it('/h command', () => {
+      const action = extractCmdAction('/h');
+      action(undefined, {
+        sendMessage: (cmdList) => {
+          expect(cmdList).to.be.a('string');
+          expect(cmdList).to.not.be.empty;
+        }
+      });
+    });
+    it('/img command', () => {
+      const action = extractCmdAction('/img');
+      action(undefined, {
+        takeImage: (count) => {
+          expect(count).to.be.equal(RPCAM_SNAPSHOTS_PER_IMG_CMD);
+        }
+      });
+    });
+    it('/vid command', () => {
+      const action = extractCmdAction('/vid');
+      action(undefined, {
+        recordVideo: (duration) => {
+          expect(duration).to.be.equal(RPCAM_VIDEO_CMD_DURATION);
+        }
+      });
+    });
 
-  it('/vid command parse', () => {
-    const cmd = commands.parse('/vid');
-    expect(cmd.cmd).to.be.eq('/vid');
-    expect(cmd.action).to.be.not.eq(undefined);
-  });
-
-  it('/sub command parse', () => {
-    const cmd = commands.parse('/sub');
-    expect(cmd.cmd).to.be.eq('/sub');
-    expect(cmd.action).to.be.not.eq(undefined);
-  });
-
-  it('/unsub command parse', () => {
-    const cmd = commands.parse('/unsub');
-    expect(cmd.cmd).to.be.eq('/unsub');
-    expect(cmd.action).to.be.not.eq(undefined);
-  });
-
-  it('/i command parse', () => {
-    const cmd = commands.parse('/i');
-    expect(cmd.cmd).to.be.eq('/i');
-    expect(cmd.action).to.be.not.eq(undefined);
-  });
-
-  it('undefined command parse', () => {
-    const cmd = commands.parse('/somethig-else');
-    expect(cmd).to.be.eq(undefined);
+    it('/sub command', () => {
+      const chatId = 1234;
+      const action = extractCmdAction('/sub');
+      action(chatId, {
+        subscribe: (id) => {
+          expect(id).to.be.a('number');
+          expect(id).to.be.equal(chatId);
+        }
+      });
+    });
+    it('/unsub command', () => {
+      const chatId = 4321;
+      const action = extractCmdAction('/unsub');
+      action(chatId, {
+        unsubscribe: (id) => {
+          expect(id).to.be.a('number');
+          expect(id).to.be.equal(chatId);
+        }
+      });
+    });
+    it('/i command', () => {
+      const action = extractCmdAction('/i');
+      action(undefined, {
+        SUBSCRIBERS: [12345],
+        sendMessage: (msg) => {
+          expect(msg).to.be.a('string');
+          expect(msg).to.be.eq(JSON.stringify([12345]));
+        }
+      });
+    });
+    it('undefined command', () => {
+      const cmd = parse('/somethig-else');
+      expect(cmd).to.be.eq(undefined);
+    });
   });
 });
