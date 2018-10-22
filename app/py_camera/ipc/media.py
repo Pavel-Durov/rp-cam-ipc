@@ -27,13 +27,13 @@ class Media():
         {'type': ipc_event, 'data': {'payload': payload}})
 
   def capture(self, cmd):
-    self.logger.info('RECIEVED RPCAM_CAPTURE', cmd)
+    self.logger.info('RECIEVED RPCAM_CAPTURE {}'.format(cmd))
     time.sleep(5)
     payload = self.cam.capture(cmd['num'])
     self.add_message(self.ipc_events['RPCAM_CAPTURE_READY'], payload)
 
   def record(self, cmd):
-    self.logger.info('RECIEVED RPCAM_VIDEO_RECORD', cmd)
+    self.logger.info('RECIEVED RPCAM_VIDEO_RECORD {}'.format(cmd))
     payload = self.cam.video(cmd['sec'])
     self.add_message(self.ipc_events['RPCAM_VIDEO_RECORD_READY'], payload)
 

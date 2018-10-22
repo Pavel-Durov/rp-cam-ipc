@@ -2,6 +2,10 @@ import os
 import time
 import json
 import calendar
+import logging
+import sys
+
+logger = logging.getLogger('fs_util')
 
 IPC_CONST_JSON_FILE = 'app/core/ipc-const.json'
 IPC_EVENTS_JSON_FILE = 'app/core/events.json'
@@ -80,3 +84,15 @@ def __append_full_path(media_file, dir_type):
 
 def __generate_file_name(ext):
   return __get_timestamp_str() + ext
+
+
+def convert_h264_to_mp4(path):
+  try:
+    convertedPath = path.replace("h264", "mp4")
+    cmd = "MP4Box -fps 20 -add {} {} ".format(path, convertedPath)
+    os.system(cmd)
+    return convertedPath
+  except:
+    logger.error('Error on h264-mp4 convertion {}'.format(sys.exc_info()))
+  finally:
+    os.remove(path)

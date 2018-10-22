@@ -20,21 +20,25 @@ class Camera(object):
   CAM_RESOLUTION_SD = (640, 480)
   CAM_RESOLUTION_HD = (1280, 720)
   CAM_FRAMERATE = 24
+  _on_motion_detected = None
 
   def __init__(self, on_motion_detected):
     self.logger = logging.getLogger('Camera')
-    self.on_motion_detected = on_motion_detected
+    self._on_motion_detected = on_motion_detected
+    self._set_cam()
+    self._set_default_config()
+    self.action = None
+
+  def _set_cam(self):
     if RP_CONTEXT:
       self.cam = picamera.PiCamera()
     else:
       self.cam = MockedCamera()
-    self.set_default_config()
-    self.action = None
 
   def dispose(self):
     self.cam.close()
 
-  def set_default_config(self):
+  def _set_default_config(self):
     self.set_config(self.CAM_RESOLUTION_HD)
 
   def set_config(self, resolution):
@@ -58,31 +62,21 @@ class Camera(object):
     self.logger.info('capture result {}'.format(result))
     return result
 
-  def __normalize_rec_time(self, sec):
+  def _normalize_rec_time(self, sec):
     result = sec
     if sec < self.RECORDING_LENGTH_MIN_SEC:
       result = self.RECORDING_LENGTH_MIN_SEC
     return result
 
   def convert(self, path):
-    try:
-      convertedPath = path.replace("h264", "mp4")
-      cmd = "MP4Box -fps 20 -add {} {} ".format(path, convertedPath)
-      self.logger.info('RUNNING H263 to MP4 convetion')
-      self.logger.info(cmd)
-      os.system(cmd)
-      return convertedPath
-    except:
-      self.logger.error(
-          'Error on h264-mp4 convertion {}'.format(sys.exc_info()))
-    finally:
-      os.remove(path)
+    logger.info('RUNNING H263 to MP4 convetion')
+    return fs.convert_h264_to_mp4(path)
 
   def video(self, sec):
     path = None
     try:
       path = fs.generate_H264_absolute_file_name(fs.VIDEO)
-      sec = self.__normalize_rec_time(sec)
+      sec = self._normalize_rec_time(sec)
       self.logger.info('recording started, {}, {} sec'.format(path, sec))
       self.cam.start_recording(path)
       self.cam.wait_recording(sec)
@@ -105,11 +99,11 @@ class Camera(object):
         self.cam.stop_recording()
         if(output.motion_detected):
           path = self.convert(path)
-          self.on_motion_detected(path)
+          self._on_motion_detected(path)
     except:
       self.logger.error(sys.exc_info())
     finally:
-      self.set_default_config()
+      self._set_default_config()
 
 if RP_CONTEXT:
   # Source: https://picamera.readthedocs.io/en/release-1.10/api_array.html
@@ -126,6 +120,7 @@ if RP_CONTEXT:
         self.motion_detected = True
 
 else:
+  logger = logging.getLogger('MockedCamera')
   class MockedCamera(object):
     resolution = 0
     framerate = 0
@@ -136,16 +131,20 @@ else:
     def capture(self, file_path, use_video_port):
       self.logger.info('capture')
 
-    def start_recording(path, format, motion_output=None):
-      self.logger.info('start_recording')
+    @staticmethod
+    def start_recording(sepath, format, motion_output=None):
+      logger.info('start_recording')
 
+    @staticmethod
     def wait_recording(sec):
-      self.logger.info('wait_recording:s‰tart')
+      logger.info('wait_recording:s‰tart')
       time.sleep(sec)
-      self.logger.info('wait_recording:stop')
+      logger.info('wait_recording:stop')
 
+    @staticmethod
     def stop_recording():
-      self.logger.info('stop_recording')
+      logger.info('stop_recording')
 
+    @staticmethod
     def close(self):
-      self.logger.info('CLOSE')
+      logger.info('CLOSE')
