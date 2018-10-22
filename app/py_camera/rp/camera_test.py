@@ -16,10 +16,9 @@ except ImportError:
 
 
 class Camera(object):
-  RECORDING_LENGTH_MIN_SEC = 1
-  CAM_RESOLUTION_SD = (640, 480)
-  CAM_RESOLUTION_HD = (1280, 720)
-  CAM_FRAMERATE = 24
+  RECORDING_TIME_MIN_SEC = 1
+  CAM_RESOLUTION = (1024, 768)
+  CAM_FRAMERATE = 30
 
   def __init__(self, on_motion_detected):
     self.logger = logging.getLogger('Camera')
@@ -28,17 +27,14 @@ class Camera(object):
       self.cam = picamera.PiCamera()
     else:
       self.cam = MockedCamera()
-    self.set_default_config()
+    self._set_config()
     self.action = None
 
   def dispose(self):
     self.cam.close()
 
-  def set_default_config(self):
-    self.set_config(self.CAM_RESOLUTION_HD)
-
-  def set_config(self, resolution):
-    self.cam.resolution = resolution
+  def _set_config(self):
+    self.cam.resolution = self.CAM_RESOLUTION
     self.cam.framerate = self.CAM_FRAMERATE
 
   def capture(self, num):
@@ -60,8 +56,8 @@ class Camera(object):
 
   def __normalize_rec_time(self, sec):
     result = sec
-    if sec < self.RECORDING_LENGTH_MIN_SEC:
-      result = self.RECORDING_LENGTH_MIN_SEC
+    if sec < self.RECORDING_TIME_MIN_SEC:
+      result = self.RECORDING_TIME_MIN_SEC
     return result
 
   def convert(self, path):
@@ -96,20 +92,16 @@ class Camera(object):
 
   def detect_motion(self, sec):
     try:
+      self.logger.info('motion_detection: started')
       with MotionDetector(self.cam) as output:
-        path = fs.generate_H264_absolute_file_name(fs.MOTION_DETECTION)
-        self.logger.info('motion_detection: path: {}, length: {}'.format(path, sec))
-        self.set_config(self.CAM_RESOLUTION_SD)
-        self.cam.start_recording(path, motion_output=output)
+        self.logger.info('motion_detection: start_recording')
+        self.cam.start_recording('/dev/null', format='h264', motion_output=output)
         self.cam.wait_recording(sec)
         self.cam.stop_recording()
         if(output.motion_detected):
-          path = self.convert(path)
-          self.on_motion_detected(path)
+          self.on_motion_detected()
     except:
       self.logger.error(sys.exc_info())
-    finally:
-      self.set_default_config()
 
 if RP_CONTEXT:
   # Source: https://picamera.readthedocs.io/en/release-1.10/api_array.html
