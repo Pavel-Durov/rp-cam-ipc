@@ -3,6 +3,10 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Pavel-Durov/rp-cam-ipc.git"
+  },
   "scripts": {
     "test": "npm-run-all -p test:js test:py",
     "test:js": "_mocha 'app/**/*.spec.js' --timeout 30000",
@@ -15,7 +19,8 @@
     "stop:ipc-media": "pkill -f ipc-media.py",
     "lint": "eslint .",
     "stop": "npm-run-all -p stop:ipc-server stop:ipc-telegramBot stop:ipc-media",
-    "start": "npm-run-all -s start:ipc-server start:ipc-telegramBot start:ipc-media"
+    "start": "npm-run-all -s start:ipc-server start:ipc-telegramBot start:ipc-media",
+    "coverage": "nyc --reporter=text-lcov _mocha 'app/**/*.spec.js' --timeout 30000 | coveralls"
   },
   "author": "Pavel Durov",
   "license": "ISC",
@@ -28,6 +33,7 @@
   "devDependencies": {
     "chai": "4.2.0",
     "codecov": "3.1.0",
+    "coveralls": "^3.0.2",
     "eslint": "5.7.0",
     "mocha": "5.2.0",
     "npm-run-all": "4.1.3",
