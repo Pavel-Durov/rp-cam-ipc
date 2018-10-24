@@ -10,6 +10,7 @@
   "scripts": {
     "test": "npm-run-all -p test:js test:py",
     "test:js": "_mocha 'app/**/*.spec.js' --timeout 30000",
+    "coverage:js": "nyc --reporter=text-lcov _mocha 'app/**/*.spec.js' --timeout 30000  > coverage.lcov && codecov",
     "test:py": "python3 -m unittest discover -s ./app/py_camera/ -p '*_test.py'",
     "start:ipc-server": "pm2 start app/server/ipc-server.js --name piCam-IPC-Server",
     "stop:ipc-server": "pm2 stop piCam-IPC-Server",
@@ -19,8 +20,7 @@
     "stop:ipc-media": "pkill -f ipc-media.py",
     "lint": "eslint .",
     "stop": "npm-run-all -p stop:ipc-server stop:ipc-telegramBot stop:ipc-media",
-    "start": "npm-run-all -s start:ipc-server start:ipc-telegramBot start:ipc-media",
-    "coverage": "nyc --reporter=text-lcov _mocha 'app/**/*.spec.js' --timeout 30000 && codecov"
+    "start": "npm-run-all -s start:ipc-server start:ipc-telegramBot start:ipc-media"
   },
   "author": "Pavel Durov",
   "license": "ISC",

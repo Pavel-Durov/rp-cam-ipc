@@ -28,7 +28,9 @@ pip-delete-this-directory.txt
 # media files
 app/media
 
-#vim 
+#vim
 *.swp
 
+# code coverage
+coverage.*
 
