@@ -20,7 +20,7 @@
     "lint": "eslint .",
     "stop": "npm-run-all -p stop:ipc-server stop:ipc-telegramBot stop:ipc-media",
     "start": "npm-run-all -s start:ipc-server start:ipc-telegramBot start:ipc-media",
-    "coverage": "nyc --reporter=text-lcov _mocha 'app/**/*.spec.js' --timeout 30000 | coveralls"
+    "coverage": "nyc --reporter=text-lcov _mocha 'app/**/*.spec.js' --timeout 30000 && codecov"
   },
   "author": "Pavel Durov",
   "license": "ISC",
