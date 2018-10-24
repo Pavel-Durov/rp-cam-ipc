@@ -14,13 +14,17 @@ class Media():
   OUTGOING_MESSAGES = []
   INCOMING_MESSAGES = []
   MOTION_DETECTION_LENGTH_SEC = 15
+  _outgoing_messages_lock = Lock()
+  _incoming_messages_lock = Lock()
 
   def __init__(self, motion_detection_length_sec):
+    self.OUTGOING_MESSAGES = []
+    self.INCOMING_MESSAGES = []
+    self._outgoing_messages_lock = Lock()
+    self._incoming_messages_lock = Lock()
     self.MOTION_DETECTION_LENGTH_SEC = motion_detection_length_sec
     self.cam = Camera(self.motion_detected)
     self.logger = logging.getLogger('ipc-media')
-    self.outgoing_messages_lock = Lock()
-    self.incoming_messages_lock = Lock()
 
   @staticmethod
   def format_msg(ipc_event, payload):
@@ -53,19 +57,19 @@ class Media():
       self.record(payload)
 
   def accept_event(self, cmd):
-    with self.incoming_messages_lock:
+    with self._incoming_messages_lock:
       self.INCOMING_MESSAGES.append(cmd)
       self.logger.info('appending message to collection')
 
   def dispatch_outstanding(self, client):
-    with self.outgoing_messages_lock:
+    with self._outgoing_messages_lock:
       while len(self.OUTGOING_MESSAGES) != 0:
         self.logger.info('dispatching outstanding messages')
         message = self.OUTGOING_MESSAGES.pop()
         client.send(message)
 
-  def process_incomming(self):
-    with self.incoming_messages_lock:
+  def process_incoming(self):
+    with self._incoming_messages_lock:
       while len(self.INCOMING_MESSAGES) != 0:
         self.logger.info('handling incomming messages')
         cmd = self.INCOMING_MESSAGES.pop()
@@ -82,7 +86,7 @@ class Media():
       while self.running:
         try:
           self.dispatch_outstanding(client)
-          self.process_incomming()
+          self.process_incoming()
         finally:
           self.cam.detect_motion(self.MOTION_DETECTION_LENGTH_SEC)
           time.sleep(1)
