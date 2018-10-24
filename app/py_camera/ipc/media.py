@@ -22,9 +22,12 @@ class Media():
     self.outgoing_messages_lock = Lock()
     self.incoming_messages_lock = Lock()
 
+  @staticmethod
+  def format_msg(ipc_event, payload):
+    return {'type': ipc_event, 'data': {'payload': payload}}
+
   def add_message(self, ipc_event, payload):
-    self.OUTGOING_MESSAGES.append(
-        {'type': ipc_event, 'data': {'payload': payload}})
+    self.OUTGOING_MESSAGES.append(self.format_msg(ipc_event, payload))
 
   def capture(self, cmd):
     self.logger.info('RECIEVED RPCAM_CAPTURE {}'.format(cmd))
@@ -73,7 +76,7 @@ class Media():
     self.ipc_events = ipc_events
     self.running = True
     with IpcClient(self.ipc_socket) as client:
-      client.incomeObservable.subscribe(self.accept_event)
+      client.income_observable.subscribe(self.accept_event)
       client.run()
 
       while self.running:

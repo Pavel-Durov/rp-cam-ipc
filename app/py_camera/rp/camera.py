@@ -92,7 +92,8 @@ class Camera(object):
     try:
       with MotionDetector(self.cam) as output:
         path = fs.generate_H264_absolute_file_name(fs.MOTION_DETECTION)
-        self.logger.info('motion_detection: path: {}, length: {}'.format(path, sec))
+        self.logger.info(
+            'motion_detection: path: {}, length: {}'.format(path, sec))
         self.set_config(self.CAM_RESOLUTION_SD)
         self.cam.start_recording(path, motion_output=output)
         self.cam.wait_recording(sec)
@@ -105,15 +106,17 @@ class Camera(object):
     finally:
       self._set_default_config()
 
+
 if RP_CONTEXT:
   # Source: https://picamera.readthedocs.io/en/release-1.10/api_array.html
   class MotionDetector(picamera.array.PiMotionAnalysis):
     motion_detected = False
+
     def analyse(self, a):
       a = np.sqrt(
           np.square(a['x'].astype(np.float)) +
           np.square(a['y'].astype(np.float))
-          ).clip(0, 255).astype(np.uint8)
+      ).clip(0, 255).astype(np.uint8)
       # If there're more than 10 vectors with a magnitude greater
       # than 60, then say we've detected motion
       if (a > 60).sum() > 10:
@@ -121,6 +124,7 @@ if RP_CONTEXT:
 
 else:
   logger = logging.getLogger('MockedCamera')
+
   class MockedCamera(object):
     resolution = 0
     framerate = 0
@@ -148,3 +152,12 @@ else:
     @staticmethod
     def close(self):
       logger.info('CLOSE')
+
+  class MotionDetector():
+    analyse_started = False
+
+    def __init__(self, cam):
+      self.cam = cam
+
+    def analyse(self, a):
+      self.analyse_started = True
