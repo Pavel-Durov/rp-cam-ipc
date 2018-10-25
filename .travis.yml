@@ -8,6 +8,7 @@ install:
   - npm install
   - pyenv global 3.6.3
   - pip3 install rx
+  - pip3 install numpy
 script:
   - npm test
   - npm run lint
