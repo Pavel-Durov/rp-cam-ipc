@@ -48,7 +48,7 @@ class Media():
     self.logger.info('RPCAM_MOTION_DETECTED')
     self.add_message(self.ipc_events['RPCAM_MOTION_DETECTED'], path)
 
-  def parce_cmd(self, cmd):
+  def parse_cmd(self, cmd):
     self.logger.info(cmd)
     payload = cmd['data']['payload']
     if cmd['type'] == self.ipc_events['RPCAM_CAPTURE']:
@@ -73,7 +73,7 @@ class Media():
       while len(self.INCOMING_MESSAGES) != 0:
         self.logger.info('handling incomming messages')
         cmd = self.INCOMING_MESSAGES.pop()
-        self.parce_cmd(cmd)
+        self.parse_cmd(cmd)
 
   def run(self, ipc_socket, ipc_events):
     self.ipc_socket = ipc_socket
