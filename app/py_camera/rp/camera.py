@@ -90,14 +90,17 @@ class Camera(object):
       with MotionDetector(self.cam) as output:
         path = fs.generate_H264_absolute_file_name(fs.MOTION_DETECTION)
         self.logger.info(
-            'motion_detection: path: {}, length: {}'.format(path, sec))
+            'detecting motion: path: {}, length: {}'.format(path, sec))
         self.set_config(self.CAM_RESOLUTION_SD)
         self.cam.start_recording(path, motion_output=output)
         self.cam.wait_recording(sec)
         self.cam.stop_recording()
         if(output.motion_detected):
+          self.logger.info('motion DETECTED!')
           convened_path = self.convert(path)
           self._on_motion_detected(convened_path)
+        else:
+          self.logger.info('motion not found')
         self.logger.info('deleting file: {}'.format(path))
         fs.delete_file(path)
     except:
