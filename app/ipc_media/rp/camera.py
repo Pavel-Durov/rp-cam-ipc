@@ -119,9 +119,7 @@ if RP_CONTEXT:
           np.square(a['x'].astype(np.float)) +
           np.square(a['y'].astype(np.float))
       ).clip(0, 255).astype(np.uint8)
-      # If there're more than 10 vectors with a magnitude greater
-      # than 60, then say we've detected motion
-      if (a > 60).sum() > 10:
+      if (a > 30).sum() > 2:
         self.motion_detected = True
 
 else:
