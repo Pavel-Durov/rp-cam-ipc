@@ -96,8 +96,9 @@ class Camera(object):
         self.cam.wait_recording(sec)
         self.cam.stop_recording()
         if(output.motion_detected):
-          path = self.convert(path)
-          self._on_motion_detected(path)
+          convened_path = self.convert(path)
+          self._on_motion_detected(convened_path)
+        self.logger.info('deleting file: {}'.format(path)
         fs.delete_file(path)
     except:
       self.logger.error(sys.exc_info())
@@ -108,27 +109,27 @@ class Camera(object):
 if RP_CONTEXT:
   # Source: https://picamera.readthedocs.io/en/release-1.10/api_array.html
   class MotionDetector(picamera.array.PiMotionAnalysis):
-    motion_detected = False
+    motion_detected=False
 
     def analyse(self, a):
-      a = np.sqrt(
+      a=np.sqrt(
           np.square(a['x'].astype(np.float)) +
           np.square(a['y'].astype(np.float))
       ).clip(0, 255).astype(np.uint8)
       # If there're more than 10 vectors with a magnitude greater
       # than 60, then say we've detected motion
       if (a > 60).sum() > 10:
-        self.motion_detected = True
+        self.motion_detected=True
 
 else:
-  logger = logging.getLogger('MockedCamera')
+  logger=logging.getLogger('MockedCamera')
 
   class MockedCamera(object):
-    resolution = 0
-    framerate = 0
+    resolution=0
+    framerate=0
 
     def __init__(self):
-      self.logger = logging.getLogger('MockedCamera')
+      self.logger=logging.getLogger('MockedCamera')
 
     def capture(self, file_path, use_video_port):
       self.logger.info('capture')
@@ -152,10 +153,10 @@ else:
       logger.info('CLOSE')
 
   class MotionDetector():
-    analyse_started = False
+    analyse_started=False
 
     def __init__(self, cam):
-      self.cam = cam
+      self.cam=cam
 
     def analyse(self, a):
-      self.analyse_started = True
+      self.analyse_started=True
