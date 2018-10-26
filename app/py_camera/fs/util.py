@@ -96,3 +96,10 @@ def convert_h264_to_mp4(path):
     logger.error('Error on h264-mp4 convertion {}'.format(sys.exc_info()))
   finally:
     os.remove(path)
+
+
+def delete_file(path):
+  if os.path.exists(path):
+    os.remove(path)
+  else:
+    print('The file {} does not exist'.format(path))
