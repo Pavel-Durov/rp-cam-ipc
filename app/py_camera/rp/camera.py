@@ -95,11 +95,10 @@ class Camera(object):
         self.cam.start_recording(path, motion_output=output)
         self.cam.wait_recording(sec)
         self.cam.stop_recording()
-        fs.delete_file(path)
         if(output.motion_detected):
-
           path = self.convert(path)
           self._on_motion_detected(path)
+        fs.delete_file(path)
     except:
       self.logger.error(sys.exc_info())
     finally:

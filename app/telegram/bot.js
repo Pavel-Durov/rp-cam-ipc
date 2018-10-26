@@ -99,8 +99,8 @@ const bot = {
     bot.api.on('message', message => {
       const { chat: { id }, text } = message;
       const cmd = parse(text);
-      bot.sendMessage('PROCESSING 🤓');
       if (cmd) {
+        bot.sendMessage('PROCESSING 🤓');
         cmd.action(id, bot);
       } else {
         bot.sendMessage(STR.UNKNOWN_CMD);
