@@ -92,8 +92,8 @@ const bot = {
       }
     });
     await api.getMe();
-    bot.start_listening();
     bot.setApi(api);
+    bot.start_listening();
   },
   start_listening: () => {
     bot.api.on('message', message => {
