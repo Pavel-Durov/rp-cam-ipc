@@ -47,15 +47,12 @@ class Camera(object):
 
   def capture(self, num):
     result = []
-    for i in range(0, num):
-      file_path = None
+    for _ in range(0, num):
       try:
-        self.logger.info('capture in progress')
-        file_path = fs.generate_JPEG_absolute_file_name(fs.IMG_GENERAL)
-        self.cam.capture(file_path, use_video_port=True)
-        if not RP_CONTEXT:
-          file_path = 'https://chocolatey.org/content/packageimages/nodejs.10.7.0.png'
-        result.append(file_path)
+        path = fs.generate_JPEG_absolute_file_name(fs.IMG_GENERAL)
+        self.logger.info('capture in progress {}'.format(path))
+        self.cam.capture(path, use_video_port=True)
+        result.append(path)
       except:
         self.logger.error(sys.exc_info())
 
