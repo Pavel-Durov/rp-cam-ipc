@@ -69,7 +69,7 @@ class Camera(object):
     return result
 
   def convert(self, path):
-    logger.info('RUNNING H263 to MP4 convetion')
+    self.logger.info('RUNNING H263 to MP4 convetion')
     return fs.convert_h264_to_mp4(path)
 
   def video(self, sec):
