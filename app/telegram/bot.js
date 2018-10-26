@@ -58,14 +58,15 @@ const bot = {
     return Promise.all(promises);
   },
   sendVideo: async (path, caption) => {
+    log(`sending video ${path}`);
     await bot.notify(async function (id) {
       await bot.api.sendVideo({ chat_id: id, caption: caption, video: path });
     });
 
     await deleteFile(path);
   },
-  onMotionDetected: (path) => {
-    bot.sendVideo(path, `🕵️ Motion Detected, ${(new Date()).toLocaleString()}`);
+  onMotionDetected: (videoPath) => {
+    bot.sendVideo(videoPath, `🕵️ Motion Detected, ${(new Date()).toLocaleString()}`);
   },
   notify: asyncFunc => {
     log('notify,', bot.SUBSCRIBERS);
