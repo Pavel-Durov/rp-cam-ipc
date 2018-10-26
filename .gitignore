@@ -33,4 +33,4 @@ app/media
 
 # code coverage
 coverage.*
-
+.coverage*
