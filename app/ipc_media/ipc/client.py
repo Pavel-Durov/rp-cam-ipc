@@ -1,5 +1,6 @@
 import re
 import sys
+import time
 import json
 import socket
 import logging
@@ -8,20 +9,19 @@ from rx import Observable, Observer
 
 
 class IpcClient():
-  INCOMING_MESSAGES = []
-  incomeObservable = None
-  incomeObserver = None
+  income_observable = None
+  _income_observer = None
 
   def __init__(self, server_address):
     self.logger = logging.getLogger('IpcClient')
     self.addr = server_address
     self.sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
-    self.recieve_msg = False
+    self.receive_msg = False
     self.messages_lock = Lock()
-    self.incomeObservable = Observable.create(self.init_incomeObservable)
+    self.income_observable = Observable.create(self.init_income_observable)
 
-  def init_incomeObservable(self, observer):
-    self.incomeObserver = observer
+  def init_income_observable(self, observer):
+    self._income_observer = observer
 
   def connect(self):
     self.logger.info('Connect')
@@ -48,29 +48,29 @@ class IpcClient():
 
   def send(self, jsonMsg):
     msg = self.stringify_json(jsonMsg)
-    self.logger.info('Sending Message', jsonMsg)
+    self.logger.info('Sending Message {}'.format(jsonMsg))
     self.sock.send(msg)
 
   def parse_json(self, response):
     strJson = re.sub(r'[\x0c]', '', str(response, 'UTF-8'))
     return json.loads(strJson)
 
-  def threadfunc(self):
-    self.recieve_msg = True
+  def ipc_client_routine(self):
+    self.receive_msg = True
     try:
-      while self.recieve_msg:
+      while self.receive_msg:
         msg = self.recieve()
         cmd = self.parse_json(msg)
         with self.messages_lock:
           self.logger.info(cmd)
-          self.incomeObserver.on_next(cmd)
+          self._income_observer.on_next(cmd)
     except:
       self.logger.error(sys.exc_info())
 
   def stop(self):
-    self.recieve_msg = False
+    self.receive_msg = False
 
-  def run(self):
-    th = Thread(target=self.threadfunc)
-    th.daemon = True
+  def run(self, deamon=True):
+    th = Thread(target=self.ipc_client_routine)
+    th.daemon = deamon
     th.start()

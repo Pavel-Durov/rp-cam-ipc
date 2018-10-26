@@ -7,37 +7,40 @@ const {
   head
 } = require('ramda');
 
+const {
+  RPCAM_SNAPSHOTS_PER_IMG_CMD,
+  RPCAM_VIDEO_CMD_DURATION
+} = require('../core/ipc-const');
+
 const log = require('debug')('bot:commands');
-const LOG_TAG = 'CMD';
 
 function generateCmdList() {
-  return cmdModule.list.map(({cmd, description}) => `${cmd}:    ${description}`).join('\n');
+  return CMD_LIST.map(({ cmd, description }) => `${cmd}:    ${description}`).join('\n');
 }
 
 const HELP_CMD = {
   cmd: '/h',
   description: 'command list',
-  action: (_, bot) => {
-    log(generateCmdList());
+  action: (chatId, bot) => {
     bot.sendMessage(generateCmdList());
-    log(LOG_TAG, 'HELP_CMD');
+    log('HELP_CMD:action');
   }
 };
 
 const IMG_CMD = {
   cmd: '/img',
   description: 'take a snapshot',
-  action: (_, bot) => {
-    bot.takeImage(1);
-    log(LOG_TAG, 'IMG_CMD');
+  action: (chatId, bot) => {
+    bot.takeImage(RPCAM_SNAPSHOTS_PER_IMG_CMD);
+    log('IMG_CMD:action');
   }
 };
 
 const VID_CMD = {
   cmd: '/vid',
   description: 'record video',
-  action: (_, bot) => {
-    bot.recordVideo(5);
+  action: (chatId, bot) => {
+    bot.recordVideo(RPCAM_VIDEO_CMD_DURATION);
     log('VID_CMD:action');
   }
 };
@@ -45,8 +48,8 @@ const VID_CMD = {
 const SUB_CMD = {
   cmd: '/sub',
   description: 'subscribe to notifications',
-  action: (message, bot) => {
-    bot.subscribe(message.chat.id);
+  action: (chatId, bot) => {
+    bot.subscribe(chatId);
     log('SUB_CMD:action');
   }
 };
@@ -54,8 +57,8 @@ const SUB_CMD = {
 const UNSUB_CMD = {
   cmd: '/unsub',
   description: 'unsubscribe to notifications',
-  action: (message, bot) => {
-    bot.unsubscribe(message.chat.id);
+  action: (chatId, bot) => {
+    bot.unsubscribe(chatId);
     log('UNSUB_CMD:action');
   }
 };
@@ -63,18 +66,19 @@ const UNSUB_CMD = {
 const INFO_CMD = {
   cmd: '/i',
   description: 'general info',
-  action: (_, bot) => {
+  action: (chatId, bot) => {
     bot.sendMessage(JSON.stringify(bot.SUBSCRIBERS));
     log('INFO_CMD:action');
   }
 };
 
-const filterCmd = str => filter(propEq('cmd', str), cmdModule.list);
+const CMD_LIST = [HELP_CMD, IMG_CMD, VID_CMD, SUB_CMD, UNSUB_CMD, INFO_CMD];
+const filterCmd = str => filter(propEq('cmd', str), CMD_LIST);
 const locateCmd = compose(head, filterCmd);
 
-const cmdModule = {
-  list: [HELP_CMD, IMG_CMD, VID_CMD, SUB_CMD, UNSUB_CMD, INFO_CMD],
-  parse: str => locateCmd(str)
+module.exports = {
+  parse: str => locateCmd(str),
+  test: {
+    filterCmd
+  }
 };
-
-module.exports = cmdModule;

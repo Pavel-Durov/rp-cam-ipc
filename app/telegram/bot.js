@@ -1,7 +1,8 @@
 const telegram = require('telegram-bot-api');
-const commands = require('./commands');
+const { parse } = require('./commands');
 const log = require('debug')('bot');
 const fs = require('fs');
+const { promisify } = require('util');
 
 const STR = {
   SUB_SUCCESS: 'Thanks for subscribing👍',
@@ -11,20 +12,19 @@ const STR = {
   UNKNOWN_CMD: 'UNKNOWN COMMAND 😠'
 };
 
-function deleteFile(path) {
-  log(`Deleting file, ${path}`);
-  fs.unlink(path, (err) => {
-    if (err) throw err;
-    log(`${path} was deleted`);
-  });
+
+async function deleteFile(path) {
+  log(`Deleting file, ${path}`, typeof (path));
+  await promisify(fs.unlink)(path);
+  log(`${path} was deleted`);
 }
 
 const bot = {
   SUBSCRIBERS: [],
   ipc: {},
   api: {},
-  takeImage: num => bot.ips.capture(num),
-  recordVideo: sec => bot.ips.recordVideo(sec),
+  takeImage: num => bot.ipc.capture(num),
+  recordVideo: sec => bot.ipc.recordVideo(sec),
   sendMessage: msg => {
     bot.notify(id => bot.api.sendMessage({ chat_id: id, text: msg }));
   },
@@ -44,31 +44,35 @@ const bot = {
       bot.SUBSCRIBERS.pop(index);
     }
   },
-  sendImage: imgPaths => {
-    (imgPaths || []).forEach(async path => {
+  sendImage: async (imgPaths) => {
+    const promises = (imgPaths || []).map(async path => {
       await bot.notify(async function (id) {
-        return bot.api.sendPhoto({
+        await bot.api.sendPhoto({
           chat_id: id,
           caption: (new Date()).toLocaleString(),
           photo: path
         });
       });
+      await deleteFile(path);
     });
+    return Promise.all(promises);
   },
   sendVideo: async (path, caption) => {
+    log(`sending video ${path}`);
     await bot.notify(async function (id) {
-      return bot.api.sendVideo({ chat_id: id, caption: caption, video: path });
+      await bot.api.sendVideo({ chat_id: id, caption: caption, video: path });
     });
-    deleteFile(path);
+
+    await deleteFile(path);
   },
-  onMotionDetected: (path) => {
-    bot.sendVideo(path, `🕵️ Motion Detected, ${(new Date()).toLocaleString()}`);
+  onMotionDetected: (videoPath) => {
+    bot.sendVideo(videoPath, `🕵️ Motion Detected, ${(new Date()).toLocaleString()}`);
   },
-  notify: func => {
+  notify: asyncFunc => {
     log('notify,', bot.SUBSCRIBERS);
     const promises = (bot.SUBSCRIBERS || []).map(async (id) => {
       try {
-        const data = await func(id);
+        const data = await asyncFunc(id);
         log(data);
       } catch (e) {
         log(e);
@@ -76,26 +80,29 @@ const bot = {
     });
     return Promise.all(promises);
   },
-  start: botIpc => {
-    bot.ips = botIpc;
-    return new Promise((resolve, reject) => {
-      bot.api = new telegram({
-        token: process.env.TELEGRAM_BOT_TOKEN,
-        updates: {
-          enabled: true,
-          get_interval: 1000
-        }
-      });
-      bot.api.getMe().then(resolve).catch(reject);
-      bot.start_listening();
+  setApi: (api) => {
+    bot.api = api;
+  },
+  start: async (botIpc) => {
+    bot.ipc = botIpc;
+    const api = new telegram({
+      token: process.env.TELEGRAM_BOT_TOKEN,
+      updates: {
+        enabled: true,
+        get_interval: 1000
+      }
     });
+    await api.getMe();
+    bot.setApi(api);
+    bot.start_listening();
   },
   start_listening: () => {
     bot.api.on('message', message => {
-      const cmd = commands.parse(message.text);
-      bot.sendMessage('PROCESSING 🤓');
+      const { chat: { id }, text } = message;
+      const cmd = parse(text);
       if (cmd) {
-        cmd.action(message, bot);
+        bot.sendMessage('PROCESSING 🤓');
+        cmd.action(id, bot);
       } else {
         bot.sendMessage(STR.UNKNOWN_CMD);
       }
