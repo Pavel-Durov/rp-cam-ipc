@@ -29,6 +29,13 @@ const bot = {
   sendMessage: msg => {
     bot.notify(id => bot.api.sendMessage({ chat_id: id, text: msg }));
   },
+  setMotionDetection: () => {
+    if (isEmpty(bot.SUBSCRIBERS)) {
+      bot.ipc.stopMotionDetection();
+    } else {
+      bot.ipc.startMotionDetection();
+    }
+  },
   subscribe: id => {
     let msg = STR.SUB_SUCCESS;
     if (bot.SUBSCRIBERS.indexOf(id) > -1) {
@@ -36,11 +43,7 @@ const bot = {
     } else {
       bot.SUBSCRIBERS.push(id);
     }
-    if (isEmpty(bot.SUBSCRIBERS)) {
-      bot.ipc.startMotionDetection();
-    } else {
-      bot.ipc.stopMotionDetection();
-    }
+    bot.setMotionDetection();
     bot.sendMessage(msg);
   },
   unsubscribe: id => {
@@ -49,6 +52,7 @@ const bot = {
       bot.sendMessage(STR.UNSUB_SUCCESS);
       bot.SUBSCRIBERS.pop(index);
     }
+    bot.setMotionDetection();
   },
   sendImage: async (imgPaths) => {
     const promises = (imgPaths || []).map(async path => {
