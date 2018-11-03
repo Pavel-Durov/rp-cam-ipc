@@ -5,5 +5,7 @@
   "RPCAM_CAPTURE_READY": "rp-cam.capture-ready",
   "RPCAM_VIDEO_RECORD": "rp-cam.record",
   "RPCAM_VIDEO_RECORD_READY": "rp-cam.record-ready",
+  "RPCAM_START_MOTION_DETECTION": "rp-cam.start-motion-detection",
+  "RPCAM_STOP_MOTION_DETECTION": "rp-cam.stop-motion-detection",
   "RPCAM_MOTION_DETECTED": "rp-cam.motion-detected"
 }

@@ -3,6 +3,7 @@ const { parse } = require('./commands');
 const log = require('debug')('bot');
 const fs = require('fs');
 const { promisify } = require('util');
+const { isEmpty } = require('ramda');
 
 const STR = {
   SUB_SUCCESS: 'Thanks for subscribing👍',
@@ -34,6 +35,11 @@ const bot = {
       msg = STR.SUB_FAIL_EXIST;
     } else {
       bot.SUBSCRIBERS.push(id);
+    }
+    if (isEmpty(bot.SUBSCRIBERS)) {
+      bot.ipc.startMotionDetection();
+    } else {
+      bot.ipc.stopMotionDetection();
     }
     bot.sendMessage(msg);
   },

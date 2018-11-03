@@ -30,14 +30,16 @@ describe('telegram bot', () => {
       bot.setApi({
         sendMessage: () => Promise.resolve()
       });
+      bot.ipc = { stopMotionDetection: () => { } };
       bot.subscribe(chatId);
       bot.unsubscribe(chatId);
       expect(bot.SUBSCRIBERS).to.be.empty;
     });
     it('sub/unsub different id', () => {
       bot.setApi({
-        sendMessage: () => Promise.resolve()
+        sendMessage: () => Promise.resolve(),
       });
+      bot.ipc = { stopMotionDetection: () => { } };
       bot.subscribe(1);
       bot.unsubscribe(2);
 

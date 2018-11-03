@@ -9,18 +9,24 @@ ipc.config.retry = 1000;
 
 
 const botIpcBridge = {
-  emit: (cmd, payload) => {
+  emit: function (cmd, payload) {
     ipc.of[ipcConst.RPCAM_SERRVER_ID].emit(cmd, {
       id: ipc.config.id,
       payload: payload
     });
   },
-  capture: num => {
+  capture: function (num) {
     botIpcBridge.emit(ipcEvents.RPCAM_CAPTURE, { num: num });
   },
-  recordVideo: sec => {
+  recordVideo: function (sec) {
     botIpcBridge.emit(ipcEvents.RPCAM_VIDEO_RECORD, { sec: sec });
-  }
+  },
+  startMotionDetection: function () {
+    botIpcBridge.emit(ipcEvents.RPCAM_START_MOTION_DETECTION);
+  },
+  stopMotionDetection: function () {
+    botIpcBridge.emit(ipcEvents.RPCAM_STOP_MOTION_DETECTION);
+  },
 };
 
 ipc.connectTo(ipcConst.RPCAM_SERRVER_ID, ipcConst.RPCAM_CAPTURE_SOCKET, () => {

@@ -16,6 +16,7 @@ class Media():
   MOTION_DETECTION_LENGTH_SEC = 15
   _outgoing_messages_lock = Lock()
   _incoming_messages_lock = Lock()
+  _detect_motion = False
 
   def __init__(self, motion_detection_length_sec):
     self.OUTGOING_MESSAGES = []
@@ -25,6 +26,10 @@ class Media():
     self.MOTION_DETECTION_LENGTH_SEC = motion_detection_length_sec
     self.cam = Camera(self.motion_detected)
     self.logger = logging.getLogger('ipc-media')
+
+  @property
+  def start_motion_detection(self):
+    self._detect_motion = True
 
   @staticmethod
   def format_msg(ipc_event, payload):
@@ -51,10 +56,15 @@ class Media():
   def parse_cmd(self, cmd):
     self.logger.info(cmd)
     payload = cmd['data']['payload']
-    if cmd['type'] == self.ipc_events['RPCAM_CAPTURE']:
+    cmd_type = cmd['type']
+    if cmd_type == self.ipc_events['RPCAM_CAPTURE']:
       self.capture(payload)
-    elif cmd['type'] == self.ipc_events['RPCAM_VIDEO_RECORD']:
+    elif cmd_type == self.ipc_events['RPCAM_VIDEO_RECORD']:
       self.record(payload)
+    elif cmd_type == self.ipc_events['RPCAM_START_MOTION_DETECTION']:
+      self.cam.detect_motion = True
+    elif cmd_type == self.ipc_events['RPCAM_STOP_MOTION_DETECTION']:
+      self.cam.detect_motion = False
 
   def accept_event(self, cmd):
     with self._incoming_messages_lock:
@@ -88,5 +98,6 @@ class Media():
           self.dispatch_outstanding(client)
           self.process_incoming()
         finally:
-          self.cam.detect_motion(self.MOTION_DETECTION_LENGTH_SEC)
+          if self._detect_motion:
+            self.cam.detect_motion(self.MOTION_DETECTION_LENGTH_SEC)
           time.sleep(1)
