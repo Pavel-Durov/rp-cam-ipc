@@ -12,21 +12,21 @@ ipc.config.retry = RPCAM_SERRVER_RETRY;
 ipc.config.logger = (a) => log(a);
 
 ipc.serve(RPCAM_CAPTURE_SOCKET, () => {
-  ipc.server.on(events.RPCAM_CAPTURE, (data) => {
-    ipc.server.broadcast(events.RPCAM_CAPTURE, data);
-  });
-  ipc.server.on(events.RPCAM_CAPTURE_READY, (data) => {
-    ipc.server.broadcast(events.RPCAM_CAPTURE_READY, data);
-  });
-  ipc.server.on(events.RPCAM_VIDEO_RECORD, (data) => {
-    ipc.server.broadcast(events.RPCAM_VIDEO_RECORD, data);
-  });
-  ipc.server.on(events.RPCAM_VIDEO_RECORD_READY, (data) => {
-    ipc.server.broadcast(events.RPCAM_VIDEO_RECORD_READY, data);
-  });
-  ipc.server.on(events.RPCAM_MOTION_DETECTED, (data) => {
-    ipc.server.broadcast(events.RPCAM_MOTION_DETECTED, data);
-  });
+  // ipc.server.on(events.RPCAM_CAPTURE, (data) => {
+  //   ipc.server.broadcast(events.RPCAM_CAPTURE, data);
+  // });
+  // ipc.server.on(events.RPCAM_CAPTURE_READY, (data) => {
+  //   ipc.server.broadcast(events.RPCAM_CAPTURE_READY, data);
+  // });
+  // ipc.server.on(events.RPCAM_VIDEO_RECORD, (data) => {
+  //   ipc.server.broadcast(events.RPCAM_VIDEO_RECORD, data);
+  // });
+  // ipc.server.on(events.RPCAM_VIDEO_RECORD_READY, (data) => {
+  //   ipc.server.broadcast(events.RPCAM_VIDEO_RECORD_READY, data);
+  // });
+  // ipc.server.on(events.RPCAM_MOTION_DETECTED, (data) => {
+  //   ipc.server.broadcast(events.RPCAM_MOTION_DETECTED, data);
+  // });
 });
 
 ipc.server.start();
