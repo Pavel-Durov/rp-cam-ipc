@@ -69,7 +69,7 @@ class Media():
   def accept_event(self, cmd):
     with self._incoming_messages_lock:
       self.INCOMING_MESSAGES.append(cmd)
-      self.logger.info('appending message to collection')
+      self.logger.info('Event Accepted: {}'.format(cmd))
 
   def dispatch_outstanding(self, client):
     with self._outgoing_messages_lock:

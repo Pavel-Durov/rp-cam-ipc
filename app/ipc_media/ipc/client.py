@@ -61,6 +61,7 @@ class IpcClient():
       while self.receive_msg:
         msg = self.recieve()
         cmd = self.parse_json(msg)
+        self.logger('Recieved Message: {}'.format(cmd))
         with self.messages_lock:
           self.logger.info(cmd)
           self._income_observer.on_next(cmd)
