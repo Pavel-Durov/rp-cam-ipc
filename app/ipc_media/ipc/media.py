@@ -27,10 +27,6 @@ class Media():
     self.cam = Camera(self.motion_detected)
     self.logger = logging.getLogger('ipc-media')
 
-  @property
-  def start_motion_detection(self):
-    self._detect_motion = True
-
   @staticmethod
   def format_msg(ipc_event, payload):
     return {'type': ipc_event, 'data': {'payload': payload}}
@@ -62,9 +58,9 @@ class Media():
     elif cmd_type == self.ipc_events['RPCAM_VIDEO_RECORD']:
       self.record(payload)
     elif cmd_type == self.ipc_events['RPCAM_START_MOTION_DETECTION']:
-      self.cam.detect_motion = True
+      self._detect_motion = True
     elif cmd_type == self.ipc_events['RPCAM_STOP_MOTION_DETECTION']:
-      self.cam.detect_motion = False
+      self._detect_motion = False
 
   def accept_event(self, cmd):
     with self._incoming_messages_lock:
