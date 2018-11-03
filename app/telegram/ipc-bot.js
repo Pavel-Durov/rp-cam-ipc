@@ -16,16 +16,16 @@ const botIpcBridge = {
     });
   },
   capture: function (num) {
-    botIpcBridge.broadcast(ipcEvents.RPCAM_CAPTURE, { num: num });
+    botIpcBridge.emit(ipcEvents.RPCAM_CAPTURE, { num: num });
   },
   recordVideo: function (sec) {
-    botIpcBridge.broadcast(ipcEvents.RPCAM_VIDEO_RECORD, { sec: sec });
+    botIpcBridge.emit(ipcEvents.RPCAM_VIDEO_RECORD, { sec: sec });
   },
   startMotionDetection: function () {
-    botIpcBridge.broadcast(ipcEvents.RPCAM_START_MOTION_DETECTION);
+    botIpcBridge.emit(ipcEvents.RPCAM_START_MOTION_DETECTION);
   },
   stopMotionDetection: function () {
-    botIpcBridge.broadcast(ipcEvents.RPCAM_STOP_MOTION_DETECTION);
+    botIpcBridge.emit(ipcEvents.RPCAM_STOP_MOTION_DETECTION);
   },
 };
 
