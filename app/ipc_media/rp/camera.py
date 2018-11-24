@@ -98,7 +98,7 @@ class Camera(object):
         if(output.motion_detected):
           self.logger.info('motion DETECTED!')
           convened_path = self.convert(path)
-          self._on_motion_detected(convened_path)
+          self._on_motion_detected(convened_path, output.score)
         else:
           self.logger.info('motion not found')
         self.logger.info('deleting file: {}'.format(path))
