@@ -48,8 +48,8 @@ class IpcClient():
     return (json.dumps(jObj) + ' \f').encode('UTF-8')
 
   def send(self, jsonMsg):
-    msg = self.stringify_json(jsonMsg)
     self.logger.info('Sending Message {}'.format(jsonMsg))
+    msg = self.stringify_json(jsonMsg)
     self.sock.send(msg)
 
   def parse_json(self, response):
