@@ -124,7 +124,7 @@ if RP_CONTEXT:
       # If there're more than 10 vectors with a magnitude greater
       # than 60, then say we've detected motion
       self.score = (a > 60).sum()
-      if score > self.threshold:
+      if self.score > self.threshold:
         self.motion_detected = True
 
 else:
