@@ -113,6 +113,8 @@ if RP_CONTEXT:
   # Source: https://picamera.readthedocs.io/en/release-1.10/api_array.html
   class MotionDetector(picamera.array.PiMotionAnalysis):
     motion_detected = False
+    score = -1
+    threshold = 10
 
     def analyse(self, a):
       a = np.sqrt(
@@ -121,7 +123,8 @@ if RP_CONTEXT:
       ).clip(0, 255).astype(np.uint8)
       # If there're more than 10 vectors with a magnitude greater
       # than 60, then say we've detected motion
-      if (a > 60).sum() > 10:
+      self.score = (a > 60).sum()
+      if score > self.threshold:
         self.motion_detected = True
 
 else:
