@@ -44,9 +44,10 @@ class Media():
     payload = self.cam.video(cmd['sec'])
     self.add_message(self.ipc_events['RPCAM_VIDEO_RECORD_READY'], payload)
 
-  def motion_detected(self, path):
+  def motion_detected(self, path, score):
     self.logger.info('RPCAM_MOTION_DETECTED')
-    self.add_message(self.ipc_events['RPCAM_MOTION_DETECTED'], path)
+    param = {'path': path, 'score': score}
+    self.add_message(self.ipc_events['RPCAM_MOTION_DETECTED'], param)
 
   def parse_cmd(self, cmd):
     self.logger.info(cmd)

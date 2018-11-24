@@ -65,8 +65,8 @@ const bot = {
 
     await deleteFile(path);
   },
-  onMotionDetected: (videoPath) => {
-    bot.sendVideo(videoPath, `🕵️ Motion Detected, ${(new Date()).toLocaleString()}`);
+  onMotionDetected: ({ path, score }) => {
+    bot.sendVideo(path, `🕵️ Motion Detected, ${(new Date()).toLocaleString()}, score: ${score}`);
   },
   notify: asyncFunc => {
     log('notify,', bot.SUBSCRIBERS);
