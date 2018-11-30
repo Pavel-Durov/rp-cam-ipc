@@ -33,14 +33,21 @@ class Media():
   def add_message(self, ipc_event, payload):
     self.OUTGOING_MESSAGES.append(self.format_msg(ipc_event, payload))
 
+  @staticmethod
+  def extract_cmd_payload(cmd):
+    payload = None
+    data = cmd['data']
+    if isinstance(data, dict) and 'payload' in cmd:
+      payload = data['payload']
+    return payload
+
   def capture(self, cmd):
-    self.logger.info('RECIEVED RPCAM_CAPTURE {}'.format(cmd))
-    time.sleep(5)
+    self.logger.info('Capruting {}'.format(cmd))
     payload = self.cam.capture(cmd['num'])
     self.add_message(self.ipc_events['RPCAM_CAPTURE_READY'], payload)
 
   def record(self, cmd):
-    self.logger.info('RECIEVED RPCAM_VIDEO_RECORD {}'.format(cmd))
+    self.logger.info('Recording {}'.format(cmd))
     payload = self.cam.video(cmd['sec'])
     self.add_message(self.ipc_events['RPCAM_VIDEO_RECORD_READY'], payload)
 
@@ -51,11 +58,12 @@ class Media():
 
   def parse_cmd(self, cmd):
     self.logger.info(cmd)
-    payload = cmd['data']['payload']
-    if cmd['type'] == self.ipc_events['RPCAM_CAPTURE']:
-      self.capture(payload)
-    elif cmd['type'] == self.ipc_events['RPCAM_VIDEO_RECORD']:
-      self.record(payload)
+    payload = Media.extract_cmd_payload(cmd)
+    if payload:
+      if cmd['type'] == self.ipc_events['RPCAM_CAPTURE']:
+        self.capture(payload)
+      elif cmd['type'] == self.ipc_events['RPCAM_VIDEO_RECORD']:
+        self.record(payload)
 
   def accept_event(self, cmd):
     with self._incoming_messages_lock:
