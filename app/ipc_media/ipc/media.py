@@ -1,7 +1,6 @@
 import re
 import time
 import json
-import json
 import logging
 import socket
 import threading
@@ -53,7 +52,7 @@ class Media():
 
   def motion_detected(self, path, score):
     self.logger.info('RPCAM_MOTION_DETECTED')
-    param = str({'path': path, 'score': score})
+    param = json.dumps({'path': path, 'score': score})
     self.add_message(self.ipc_events['RPCAM_MOTION_DETECTED'], param)
 
   def parse_cmd(self, cmd):
