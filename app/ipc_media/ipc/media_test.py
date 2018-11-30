@@ -26,8 +26,8 @@ class TestingMedia(unittest.TestCase):
     media = TestingMedia.generateMedia()
     media.motion_detected('no/such/file', -1)
     self.assertEqual(media.OUTGOING_MESSAGES, [
-        {'type': 'rp-cam.motion-detected', 'data':
-         {'payload': {'path': 'no/such/file', 'score': -1}}}])
+        {'type': 'rp-cam.motion-detected',
+         'data': {'payload': "{'path': 'no/such/file', 'score': -1}"}}])
     media.process_incoming()
     self.assertCountEqual(media.INCOMING_MESSAGES, [])
 
