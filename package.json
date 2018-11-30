@@ -10,8 +10,8 @@
   "scripts": {
     "test": "npm-run-all -p test:js test:py",
     "test:js": "_mocha 'app/**/*.spec.js' --timeout 30000",
-    "coverage:js": "nyc --reporter=json _mocha 'app/test/**/*.spec.js' --timeout 30000  > js-coverage.json",
-    "coverage:upload": "coverage js-coverage.json",
+    "coverage:js": "nyc --reporter=json _mocha 'app/test/**/*.spec.js' --timeout 30000  > coverage/js-coverage.json",
+    "coverage:upload": "codecov -f coverage/js-coverage.json",
     "test:py": "python3 -m unittest discover -s ./app/ipc_media/ -p '*_test.py'",
     "coverage:py": "coverage run -m unittest discover  -s ./app/ipc_media/ -p '*_test.py'",
     "start:ipc-node": "pm2 start ipc-startup.json",

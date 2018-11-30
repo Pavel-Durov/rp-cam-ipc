@@ -32,5 +32,6 @@ app/media
 *.swp
 
 # code coverage
+coverage
 coverage.*
 .coverage*
