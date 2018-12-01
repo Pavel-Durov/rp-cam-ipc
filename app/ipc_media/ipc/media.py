@@ -35,6 +35,7 @@ class Media():
         format_payload = payload
     except:
       self.logger.error('Serializing: {}'.format(payload))
+      self.logger.error(type(payload['score']))
       self.logger.error(sys.exc_info())
 
     return {'type': ipc_event, 'data': {'payload': format_payload}}
