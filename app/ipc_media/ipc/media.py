@@ -27,7 +27,12 @@ class Media():
 
   @staticmethod
   def format_msg(ipc_event, payload):
-    return {'type': ipc_event, 'data': {'payload': payload}}
+    format_payload = None
+    if isinstance(payload, dict):
+      format_payload = json.dumps(payload)
+    else:
+      format_payload = payload
+    return {'type': ipc_event, 'data': {'payload': format_payload}}
 
   def add_message(self, ipc_event, payload):
     self.OUTGOING_MESSAGES.append(self.format_msg(ipc_event, payload))
