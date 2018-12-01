@@ -1,4 +1,5 @@
 import re
+import sys
 import time
 import json
 import logging
@@ -25,13 +26,17 @@ class Media():
     self.cam = Camera(self.motion_detected)
     self.logger = logging.getLogger('ipc-media')
 
-  @staticmethod
-  def format_msg(ipc_event, payload):
+  def format_msg(self, ipc_event, payload):
     format_payload = None
-    if isinstance(payload, dict):
-      format_payload = json.dumps(payload)
-    else:
-      format_payload = payload
+    try:
+      if isinstance(payload, dict):
+        format_payload = json.dumps(payload)
+      else:
+        format_payload = payload
+    except:
+      self.logger.error('Serializing: {}'.format(payload))
+      self.logger.error(sys.exc_info())
+
     return {'type': ipc_event, 'data': {'payload': format_payload}}
 
   def add_message(self, ipc_event, payload):
