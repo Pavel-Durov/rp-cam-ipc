@@ -57,6 +57,7 @@ class Media():
   def capture(self, cmd):
     self.logger.info('Capturing {}'.format(cmd))
     payload = self.cam.capture(cmd['num'])
+
     self.add_message(self.ipc_events['RPCAM_CAPTURE_READY'], payload)
 
   def record(self, cmd):
@@ -80,8 +81,11 @@ class Media():
 
   def accept_event(self, cmd):
     with self._incoming_messages_lock:
+      self.logger.info('appending cmd to INCOMING_MESSAGES, len: {}'
+                       .format(len(self.INCOMING_MESSAGES)))
       self.INCOMING_MESSAGES.append(cmd)
-      self.logger.info('appending message to collection')
+      self.logger.info('done appending cmd INCOMING_MESSAGES, len: {}'
+                       .format(len(self.INCOMING_MESSAGES)))
 
   def dispatch_outstanding(self, client):
     self.logger.info('Dispatching outstanding {} messages'.format(
