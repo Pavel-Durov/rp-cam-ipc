@@ -63,7 +63,7 @@ class Media():
 
   def motion_detected(self, path, score):
     self.logger.info('RPCAM_MOTION_DETECTED')
-    param = {'path': path, 'score': score}
+    param = {'path': path, 'score': float(score)}
     self.add_message(self.ipc_events['RPCAM_MOTION_DETECTED'], param)
 
   def parse_cmd(self, cmd):
