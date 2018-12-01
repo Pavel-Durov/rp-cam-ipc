@@ -41,7 +41,10 @@ class Media():
     return {'type': ipc_event, 'data': {'payload': format_payload}}
 
   def add_message(self, ipc_event, payload):
-    self.OUTGOING_MESSAGES.append(self.format_msg(ipc_event, payload))
+    with self._outgoing_messages_lock:
+      self.logger.info('add_message ipc_event: {}, payload:{}, total: {}'
+                       .format(ipc_event, payload, len(self.OUTGOING_MESSAGES)))
+      self.OUTGOING_MESSAGES.append(self.format_msg(ipc_event, payload))
 
   @staticmethod
   def extract_cmd_payload(cmd):
@@ -81,10 +84,11 @@ class Media():
       self.logger.info('appending message to collection')
 
   def dispatch_outstanding(self, client):
+    self.logger.info('Dispatching outstanding {} messages'.format(
+        len(self.OUTGOING_MESSAGES)))
     with self._outgoing_messages_lock:
-      self.logger.info('dispatch_outstanding')
       while len(self.OUTGOING_MESSAGES) != 0:
-        self.logger.info('dispatching outstanding {} messages'.format(
+        self.logger.info('Dispatching outstanding {} messages'.format(
             len(self.OUTGOING_MESSAGES)))
         message = self.OUTGOING_MESSAGES.pop()
         client.send(message)
