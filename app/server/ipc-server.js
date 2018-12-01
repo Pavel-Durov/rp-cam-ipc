@@ -25,7 +25,7 @@ ipc.serve(RPCAM_CAPTURE_SOCKET, () => {
     ipc.server.broadcast(events.RPCAM_VIDEO_RECORD_READY, data);
   });
   ipc.server.on(events.RPCAM_MOTION_DETECTED, (data) => {
-    ipc.server.broadcast(events.RPCAM_MOTION_DETECTED, JSON.stringify(data));
+    ipc.server.broadcast(events.RPCAM_MOTION_DETECTED, data);
   });
 });
 
