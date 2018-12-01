@@ -16,7 +16,7 @@ class TestingIpcClient(unittest.TestCase):
 
   @staticmethod
   def start_server():
-    cmd = "npm run start:ipc-server > /dev/null"
+    cmd = "pm2 start ./app/server/ipc-server.js > /dev/null"
     os.system(cmd)
     # TODO: find a reliable way to indicate that server is up
     #       (instead of using magic numbers)
@@ -24,7 +24,7 @@ class TestingIpcClient(unittest.TestCase):
 
   @staticmethod
   def stop_server():
-    cmd = "npm run stop:ipc-server > /dev/null"
+    cmd = "pm2 stop all > /dev/null"
     os.system(cmd)
 
   def test_ipc_connection(self):

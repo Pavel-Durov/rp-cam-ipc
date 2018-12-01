@@ -13,4 +13,5 @@ script:
   - npm test
   - npm run lint
 after_success:
-  - npm run coverage:js
+  - ./node_modules/.bin/nyc --reporter=lcov --reporter=text-lcov npm test > nyc-coverage.lcov
+  - ./node_modules/.bin/codecov -f nyc-coverage.lcov

@@ -40,10 +40,12 @@ ipc.connectTo(ipcConst.RPCAM_SERRVER_ID, ipcConst.RPCAM_CAPTURE_SOCKET, () => {
     log(ipcEvents.RPCAM_VIDEO_RECORD_READY, data);
     telegram_bot.sendVideo(data.payload);
   });
+
   server.on(ipcEvents.RPCAM_MOTION_DETECTED, (data) => {
     log(ipcEvents.RPCAM_MOTION_DETECTED, data);
     telegram_bot.onMotionDetected(JSON.parse(data.payload));
   });
+
   server.on(ipcEvents.DISCONNECT, () => {
     log(`disconnected from ${ipcConst.RPCAM_SERRVER_ID}`);
   });

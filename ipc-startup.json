@@ -1,0 +1,18 @@
+[
+  {
+    "name": "rpCam:tBot",
+    "script": "./app/telegram/ipc-bot.js",
+    "env": {
+      "NODE_ENV": "development",
+      "DEBUG": "*"
+    }
+  },
+  {
+    "name": "rpCam:Server",
+    "script": "app/server/ipc-server.js",
+    "env": {
+      "NODE_ENV": "development",
+      "DEBUG": "*"
+    }
+  }
+]
