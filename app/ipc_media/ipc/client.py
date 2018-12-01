@@ -45,7 +45,9 @@ class IpcClient():
 
   def stringify_json(self, jObj):
     self.logger.info('stringify_json: {}'.format(jObj))
-    return (json.dumps(jObj) + ' \f').encode('UTF-8')
+    jsonStr = json.dumps(jObj)
+    jsonContent = (jsonStr + ' \f')
+    return jsonContent.encode('UTF-8')
 
   def send(self, jsonMsg):
     self.logger.info('Sending Message {}'.format(jsonMsg))
