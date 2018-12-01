@@ -84,7 +84,8 @@ class Media():
     with self._outgoing_messages_lock:
       self.logger.info('dispatch_outstanding')
       while len(self.OUTGOING_MESSAGES) != 0:
-        self.logger.info('dispatching outstanding messages')
+        self.logger.info('dispatching outstanding {} messages'.format(
+            len(self.OUTGOING_MESSAGES)))
         message = self.OUTGOING_MESSAGES.pop()
         client.send(message)
 
