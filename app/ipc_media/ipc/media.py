@@ -27,23 +27,11 @@ class Media():
     self.logger = logging.getLogger('ipc-media')
 
   def format_msg(self, ipc_event, payload):
-    format_payload = None
-    try:
-      if isinstance(payload, dict):
-        format_payload = json.dumps(payload)
-      else:
-        format_payload = payload
-    except:
-      self.logger.error('Serializing: {}'.format(payload))
-      self.logger.error(type(payload['score']))
-      self.logger.error(sys.exc_info())
-
+    format_payload = json.dumps(payload)
     return {'type': ipc_event, 'data': {'payload': format_payload}}
 
   def add_message(self, ipc_event, payload):
     with self._outgoing_messages_lock:
-      self.logger.info('add_message ipc_event: {}, payload:{}, total: {}'
-                       .format(ipc_event, payload, len(self.OUTGOING_MESSAGES)))
       self.OUTGOING_MESSAGES.append(self.format_msg(ipc_event, payload))
 
   @staticmethod
@@ -81,28 +69,19 @@ class Media():
 
   def accept_event(self, cmd):
     with self._incoming_messages_lock:
-      self.logger.info('appending cmd to INCOMING_MESSAGES, len: {}'
-                       .format(len(self.INCOMING_MESSAGES)))
       self.INCOMING_MESSAGES.append(cmd)
-      self.logger.info('done appending cmd INCOMING_MESSAGES, len: {}'
-                       .format(len(self.INCOMING_MESSAGES)))
 
   def dispatch_outstanding(self, client):
-    self.logger.info('dispatch_outstanding {} messages'.format(
-        len(self.OUTGOING_MESSAGES)))
+    self.logger.info('process out msg {}'.format(len(self.OUTGOING_MESSAGES)))
     with self._outgoing_messages_lock:
       while len(self.OUTGOING_MESSAGES) != 0:
-        self.logger.info('dispatch_outstanding {} messages'.format(
-            len(self.OUTGOING_MESSAGES)))
         message = self.OUTGOING_MESSAGES.pop()
         client.send(message)
 
   def process_incoming(self):
-    self.logger.info('process_incoming {} messages'.format(
-        len(self.INCOMING_MESSAGES)))
+    self.logger.info('process in msg {}'.format(len(self.INCOMING_MESSAGES)))
     with self._incoming_messages_lock:
       while len(self.INCOMING_MESSAGES) != 0:
-        self.logger.info('handling incomming messages')
         cmd = self.INCOMING_MESSAGES.pop()
         self.parse_cmd(cmd)
 

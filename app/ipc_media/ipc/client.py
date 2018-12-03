@@ -45,13 +45,11 @@ class IpcClient():
 
   def stringify_json(self, jObj):
     self.logger.info('stringify_json: {}'.format(jObj))
-    jsonStr = json.dumps(jObj)
-    jsonContent = (jsonStr + ' \f')
-    return jsonContent.encode('UTF-8')
+    return (json.dumps(jObj) + ' \f').encode('UTF-8')
 
   def send(self, jsonMsg):
-    self.logger.info('Sending Message {}'.format(jsonMsg))
     msg = self.stringify_json(jsonMsg)
+    self.logger.info('Sending Message {}'.format(msg))
     self.sock.send(msg)
 
   def parse_json(self, response):
