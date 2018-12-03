@@ -13,7 +13,7 @@ class TestingMedia(unittest.TestCase):
   def test_format_msg(self):
     formatted = Media.format_msg('test-event', 'test-payload')
     self.assertDictEqual(
-        formatted, {'data': {'payload': 'test-payload'},
+        formatted, {'data': {'payload': '"test-payload"'},
                     'type': 'test-event'})
 
   @staticmethod
@@ -27,7 +27,7 @@ class TestingMedia(unittest.TestCase):
     media.motion_detected('no/such/file', -1)
     self.assertEqual(media.OUTGOING_MESSAGES, [
         {'type': 'rp-cam.motion-detected',
-         'data': {'payload': {'path': 'no/such/file', 'score': -1}}}])
+         'data': {'payload': '{"path": "no/such/file", "score": -1}'}}])
     media.process_incoming()
     self.assertCountEqual(media.INCOMING_MESSAGES, [])
 
@@ -35,7 +35,7 @@ class TestingMedia(unittest.TestCase):
     media = TestingMedia.generateMedia()
     media.add_message('test-event-1', 'test-payload-2')
     self.assertEqual(media.OUTGOING_MESSAGES, [
-                     {'type': 'test-event-1', 'data': {'payload': 'test-payload-2'}}])
+                     {'type': 'test-event-1', 'data': {'payload': '"test-payload-2"'}}])
     media.add_message('test-event-2', 'test-payload-2')
     self.assertEqual(len(media.OUTGOING_MESSAGES), 2)
     media.dispatch_outstanding(MockedClient())
@@ -46,7 +46,7 @@ class TestingMedia(unittest.TestCase):
     media = TestingMedia.generateMedia()
     media.accept_event(Media.format_msg('test-event-3', 'test-payload-3'))
     self.assertEqual(media.INCOMING_MESSAGES, [
-                     {'type': 'test-event-3', 'data': {'payload': 'test-payload-3'}}])
+                     {'type': 'test-event-3', 'data': {'payload': '"test-payload-3"'}}])
     media.accept_event(Media.format_msg('test-event-4', 'test-payload-4'))
     self.assertEqual(len(media.INCOMING_MESSAGES), 2)
     media.process_incoming()

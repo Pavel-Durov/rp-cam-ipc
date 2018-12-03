@@ -26,7 +26,8 @@ class Media():
     self.cam = Camera(self.motion_detected)
     self.logger = logging.getLogger('ipc-media')
 
-  def format_msg(self, ipc_event, payload):
+  @staticmethod
+  def format_msg(ipc_event, payload):
     format_payload = json.dumps(payload)
     return {'type': ipc_event, 'data': {'payload': format_payload}}
 
