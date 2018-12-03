@@ -98,7 +98,7 @@ class Camera(object):
         if(output.motion_detected):
           self.logger.info('motion DETECTED!')
           convened_path = self.convert(path)
-          self._on_motion_detected(convened_path)
+          self._on_motion_detected(convened_path, output.score)
         else:
           self.logger.info('motion not found')
         self.logger.info('deleting file: {}'.format(path))
@@ -113,6 +113,8 @@ if RP_CONTEXT:
   # Source: https://picamera.readthedocs.io/en/release-1.10/api_array.html
   class MotionDetector(picamera.array.PiMotionAnalysis):
     motion_detected = False
+    score = -1
+    min = 10
 
     def analyse(self, a):
       a = np.sqrt(
@@ -121,8 +123,13 @@ if RP_CONTEXT:
       ).clip(0, 255).astype(np.uint8)
       # If there're more than 10 vectors with a magnitude greater
       # than 60, then say we've detected motion
-      if (a > 60).sum() > 10:
-        self.motion_detected = True
+      score = (a > 60).sum()
+
+      if score > self.score:
+        self.score = float(score)
+
+      self.motion_detected = self.score > self.min
+
 
 else:
   logger = logging.getLogger('MockedCamera')

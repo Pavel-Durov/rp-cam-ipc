@@ -39,17 +39,17 @@ ipc.connectTo(ipcConst.RPCAM_SERRVER_ID, ipcConst.RPCAM_CAPTURE_SOCKET, () => {
 
   server.on(ipcEvents.RPCAM_CAPTURE_READY, data => {
     log(ipcEvents.RPCAM_CAPTURE_READY, data);
-    telegram_bot.sendImage(data.payload);
+    telegram_bot.sendImage(JSON.parse(data.payload));
   });
 
   server.on(ipcEvents.RPCAM_VIDEO_RECORD_READY, data => {
     log(ipcEvents.RPCAM_VIDEO_RECORD_READY, data);
-    telegram_bot.sendVideo(data.payload);
+    telegram_bot.sendVideo(JSON.parse(data.payload));
   });
 
   server.on(ipcEvents.RPCAM_MOTION_DETECTED, (data) => {
     log(ipcEvents.RPCAM_MOTION_DETECTED, data);
-    telegram_bot.onMotionDetected(data.payload);
+    telegram_bot.onMotionDetected(JSON.parse(data.payload));
   });
 
   server.on(ipcEvents.DISCONNECT, () => {

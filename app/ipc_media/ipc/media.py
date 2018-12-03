@@ -1,6 +1,6 @@
 import re
+import sys
 import time
-import json
 import json
 import logging
 import socket
@@ -29,38 +29,50 @@ class Media():
 
   @staticmethod
   def format_msg(ipc_event, payload):
-    return {'type': ipc_event, 'data': {'payload': payload}}
+    format_payload = json.dumps(payload)
+    return {'type': ipc_event, 'data': {'payload': format_payload}}
 
   def add_message(self, ipc_event, payload):
-    self.OUTGOING_MESSAGES.append(self.format_msg(ipc_event, payload))
+    with self._outgoing_messages_lock:
+      self.OUTGOING_MESSAGES.append(self.format_msg(ipc_event, payload))
+
+  @staticmethod
+  def extract_cmd_payload(cmd):
+    payload = None
+    data = cmd['data']
+    if isinstance(data, dict) and 'payload' in data:
+      payload = data['payload']
+    return payload
 
   def capture(self, cmd):
-    self.logger.info('RECIEVED RPCAM_CAPTURE {}'.format(cmd))
-    time.sleep(5)
+    self.logger.info('Capturing {}'.format(cmd))
     payload = self.cam.capture(cmd['num'])
+
     self.add_message(self.ipc_events['RPCAM_CAPTURE_READY'], payload)
 
   def record(self, cmd):
-    self.logger.info('RECIEVED RPCAM_VIDEO_RECORD {}'.format(cmd))
+    self.logger.info('Recording {}'.format(cmd))
     payload = self.cam.video(cmd['sec'])
     self.add_message(self.ipc_events['RPCAM_VIDEO_RECORD_READY'], payload)
 
-  def motion_detected(self, path):
-    self.logger.info('RPCAM_MOTION_DETECTED')
-    self.add_message(self.ipc_events['RPCAM_MOTION_DETECTED'], path)
+  def motion_detected(self, path, score):
+    motion_data = {'path': path, 'score': score}
+    self.logger.info('RPCAM_MOTION_DETECTED {}'.format(motion_data))
+    self.add_message(self.ipc_events['RPCAM_MOTION_DETECTED'], motion_data)
 
   def parse_cmd(self, cmd):
-    self.logger.info(cmd)
-    payload = cmd['data']['payload']
-    cmd_type = cmd['type']
-    if cmd_type == self.ipc_events['RPCAM_CAPTURE']:
-      self.capture(payload)
-    elif cmd_type == self.ipc_events['RPCAM_VIDEO_RECORD']:
-      self.record(payload)
-    elif cmd_type == self.ipc_events['RPCAM_START_MOTION_DETECTION']:
-      self._detect_motion = True
-    elif cmd_type == self.ipc_events['RPCAM_STOP_MOTION_DETECTION']:
-      self._detect_motion = False
+    self.logger.info('parse_cmd {}'.format(cmd))
+    payload = Media.extract_cmd_payload(cmd)
+    if payload:
+      cmd_type = cmd['type']
+      if cmd_type == self.ipc_events['RPCAM_CAPTURE']:
+        self.capture(payload)
+      elif cmd_type == self.ipc_events['RPCAM_VIDEO_RECORD']:
+        self.record(payload)
+      elif cmd_type == self.ipc_events['RPCAM_START_MOTION_DETECTION']:
+        self._detect_motion = True
+      elif cmd_type == self.ipc_events['RPCAM_STOP_MOTION_DETECTION']:
+        self._detect_motion = False
 
   def accept_event(self, cmd):
     with self._incoming_messages_lock:
@@ -68,16 +80,16 @@ class Media():
       self.logger.info('Event Accepted: {}'.format(cmd))
 
   def dispatch_outstanding(self, client):
+    self.logger.info('process out msg {}'.format(len(self.OUTGOING_MESSAGES)))
     with self._outgoing_messages_lock:
       while len(self.OUTGOING_MESSAGES) != 0:
-        self.logger.info('dispatching outstanding messages')
         message = self.OUTGOING_MESSAGES.pop()
         client.send(message)
 
   def process_incoming(self):
+    self.logger.info('process in msg {}'.format(len(self.INCOMING_MESSAGES)))
     with self._incoming_messages_lock:
       while len(self.INCOMING_MESSAGES) != 0:
-        self.logger.info('handling incomming messages')
         cmd = self.INCOMING_MESSAGES.pop()
         self.parse_cmd(cmd)
 
