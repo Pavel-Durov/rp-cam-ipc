@@ -100,4 +100,4 @@ class Media():
           self.process_incoming()
         finally:
           self.cam.detect_motion(self.MOTION_DETECTION_LENGTH_SEC)
-          time.sleep(2)
+          time.sleep(1)

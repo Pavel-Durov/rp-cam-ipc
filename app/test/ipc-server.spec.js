@@ -66,7 +66,7 @@ describe(`ipc server, ${RPCAM_SERRVER_ID}, ${RPCAM_CAPTURE_SOCKET}`, () => {
     expect(4).to.be.eql(response);
   });
 
-  it('RPCAM_VIDEO_RECORD_READY event tes', async () => {
+  it('RPCAM_VIDEO_RECORD_READY event test', async () => {
     const response = await testIpcEvent(RPCAM_VIDEO_RECORD_READY, 5);
     expect(5).to.be.eql(response);
   });
