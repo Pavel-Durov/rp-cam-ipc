@@ -12,7 +12,8 @@ const {
   RPCAM_CAPTURE_READY,
   RPCAM_CAPTURE,
   RPCAM_VIDEO_RECORD,
-  RPCAM_VIDEO_RECORD_READY
+  RPCAM_VIDEO_RECORD_READY,
+  RPCAM_MOTION_DETECTED
 } = require('../core/events.json');
 
 var expect = require('chai').expect;
@@ -45,28 +46,33 @@ describe(`ipc server, ${RPCAM_SERRVER_ID}, ${RPCAM_CAPTURE_SOCKET}`, () => {
     expect(nonStrings).to.be.empty;
   });
 
-  it(`${RPCAM_CAPTURE_READY} event test`, async () => {
+  it('RPCAM_CAPTURE_READ event test', async () => {
     const response = await testIpcEvent(RPCAM_CAPTURE_READY, 1);
     expect(1).to.be.eql(response);
   });
 
-  it(`${RPCAM_CAPTURE} event test`, async () => {
+  it('RPCAM_CAPTURE event test', async () => {
     const response = await testIpcEvent(RPCAM_CAPTURE, 2);
     expect(2).to.be.eql(response);
   });
 
-  it(`${RPCAM_CAPTURE_READY} event test`, async () => {
+  it('RPCAM_CAPTURE_READY event test', async () => {
     const response = await testIpcEvent(RPCAM_CAPTURE_READY, 3);
     expect(3).to.be.eql(response);
   });
 
-  it(`${RPCAM_VIDEO_RECORD} event test`, async () => {
+  it('RPCAM_VIDEO_RECORD event test', async () => {
     const response = await testIpcEvent(RPCAM_VIDEO_RECORD, 4);
     expect(4).to.be.eql(response);
   });
 
-  it(`${RPCAM_VIDEO_RECORD_READY} event test`, async () => {
+  it('RPCAM_VIDEO_RECORD_READY event test', async () => {
     const response = await testIpcEvent(RPCAM_VIDEO_RECORD_READY, 5);
+    expect(5).to.be.eql(response);
+  });
+
+  it('RPCAM_MOTION_DETECTED event test', async () => {
+    const response = await testIpcEvent(RPCAM_MOTION_DETECTED, 5);
     expect(5).to.be.eql(response);
   });
 });
