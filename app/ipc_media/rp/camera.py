@@ -114,7 +114,7 @@ if RP_CONTEXT:
   class MotionDetector(picamera.array.PiMotionAnalysis):
     motion_detected = False
     score = -1
-    threshold = 10
+    min = 10
 
     def analyse(self, a):
       a = np.sqrt(
@@ -123,9 +123,13 @@ if RP_CONTEXT:
       ).clip(0, 255).astype(np.uint8)
       # If there're more than 10 vectors with a magnitude greater
       # than 60, then say we've detected motion
-      self.score = (a > 60).sum()
-      if self.score > self.threshold:
-        self.motion_detected = True
+      score = (a > 60).sum()
+
+      if score > self.score:
+        self.score = float(score)
+
+      self.motion_detected = self.score > self.min
+
 
 else:
   logger = logging.getLogger('MockedCamera')

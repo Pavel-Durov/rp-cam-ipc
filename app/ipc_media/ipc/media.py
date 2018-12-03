@@ -50,7 +50,7 @@ class Media():
   def extract_cmd_payload(cmd):
     payload = None
     data = cmd['data']
-    if isinstance(data, dict) and 'payload' in cmd:
+    if isinstance(data, dict) and 'payload' in data:
       payload = data['payload']
     return payload
 
@@ -66,12 +66,12 @@ class Media():
     self.add_message(self.ipc_events['RPCAM_VIDEO_RECORD_READY'], payload)
 
   def motion_detected(self, path, score):
-    self.logger.info('RPCAM_MOTION_DETECTED')
-    param = {'path': path, 'score': float(score)}
-    self.add_message(self.ipc_events['RPCAM_MOTION_DETECTED'], param)
+    motion_data = {'path': path, 'score': score}
+    self.logger.info('RPCAM_MOTION_DETECTED {}'.format(motion_data))
+    self.add_message(self.ipc_events['RPCAM_MOTION_DETECTED'], motion_data)
 
   def parse_cmd(self, cmd):
-    self.logger.info(cmd)
+    self.logger.info('parse_cmd {}'.format(cmd))
     payload = Media.extract_cmd_payload(cmd)
     if payload:
       if cmd['type'] == self.ipc_events['RPCAM_CAPTURE']:
@@ -88,18 +88,19 @@ class Media():
                        .format(len(self.INCOMING_MESSAGES)))
 
   def dispatch_outstanding(self, client):
-    self.logger.info('Dispatching outstanding {} messages'.format(
+    self.logger.info('dispatch_outstanding {} messages'.format(
         len(self.OUTGOING_MESSAGES)))
     with self._outgoing_messages_lock:
       while len(self.OUTGOING_MESSAGES) != 0:
-        self.logger.info('Dispatching outstanding {} messages'.format(
+        self.logger.info('dispatch_outstanding {} messages'.format(
             len(self.OUTGOING_MESSAGES)))
         message = self.OUTGOING_MESSAGES.pop()
         client.send(message)
 
   def process_incoming(self):
+    self.logger.info('process_incoming {} messages'.format(
+        len(self.INCOMING_MESSAGES)))
     with self._incoming_messages_lock:
-      self.logger.info('process_incoming')
       while len(self.INCOMING_MESSAGES) != 0:
         self.logger.info('handling incomming messages')
         cmd = self.INCOMING_MESSAGES.pop()
@@ -119,4 +120,4 @@ class Media():
           self.process_incoming()
         finally:
           self.cam.detect_motion(self.MOTION_DETECTION_LENGTH_SEC)
-          time.sleep(1)
+          time.sleep(2)

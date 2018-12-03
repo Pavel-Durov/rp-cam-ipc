@@ -49,7 +49,7 @@ const bot = {
       await bot.notify(async function (id) {
         await bot.api.sendPhoto({
           chat_id: id,
-          caption: (new Date()).toLocaleString(),
+          caption: `🖼️ ${(new Date()).toLocaleString()}`,
           photo: path
         });
       });
@@ -57,7 +57,7 @@ const bot = {
     });
     return Promise.all(promises);
   },
-  sendVideo: async (path, caption) => {
+  sendVideo: async (path, caption = `📹 ${(new Date()).toLocaleString()}`) => {
     log(`sending video ${path}`);
     await bot.notify(async function (id) {
       await bot.api.sendVideo({ chat_id: id, caption: caption, video: path });
@@ -66,7 +66,8 @@ const bot = {
     await deleteFile(path);
   },
   onMotionDetected: ({ path, score }) => {
-    bot.sendVideo(path, `🕵️ Motion Detected, ${(new Date()).toLocaleString()}, score: ${score}`);
+    const str =`🕵️ Motion Detected\n⏱️️ ${(new Date()).toLocaleString()}\n🖐️ # (vect > 60): ${score}`;
+    bot.sendVideo(path, str);
   },
   notify: asyncFunc => {
     log('notify,', bot.SUBSCRIBERS);
