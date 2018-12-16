@@ -1,11 +1,13 @@
 #!/usr/bin/env bash
 
-PROJ_PATH=/home/pi/projects/git-repos/rp-cam-ipc
+TELEGRAM_BOT_TOKEN=?
+PROJ_PATH=?
 
 while [[ "$(cat /sys/class/net/wlan0/operstate)" != "up" ]]; do
   echo 'waiting for network'
   sleep 5
 done
 
-npm start --prefix $PROJ_PATH
+export TELEGRAM_BOT_TOKEN
 
+npm start --prefix $PROJ_PATH
