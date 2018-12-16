@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# crontab example:
+#   @reboot bash <PATH-TO-SCRIPT>/startup.sh
 
 TELEGRAM_BOT_TOKEN=?
 PROJ_PATH=?
