@@ -8,4 +8,12 @@ Raspberry Pi camera remote control project based on [node-ipc](https://www.npmjs
 
 
 ## Dependencies:
-+ Python: rx, picamera
+### node
+```
+$ npm install
+```
+## python
+```
+pip3 install -r requirements.txt
+```
+
